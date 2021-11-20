@@ -58,6 +58,7 @@ namespace Morchul.CodeManager
 
         private void OnEnable()
         {
+            closeWindow = false;
             LoadScriptFolders();
             selectedFolderName = "SelectFolder";
             informationText = "";

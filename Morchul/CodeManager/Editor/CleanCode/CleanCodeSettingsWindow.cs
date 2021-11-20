@@ -171,7 +171,24 @@ namespace Morchul.CodeManager
 
         private void DrawCodeGuideLinesTab()
         {
+            EditorGUILayout.BeginVertical();
 
+            //NewLineBeforeOpeningCurlyBrackets
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("New line before opening curly brackets", GUILayout.MaxWidth(250));
+            settings.CodingGuidelines.NewLineBeforeOpeningCurlyBrackets = EditorGUILayout.Toggle(settings.CodingGuidelines.NewLineBeforeOpeningCurlyBrackets);
+            EditorGUILayout.EndHorizontal();
+
+            //code regexes
+            settings.CodingGuidelines.PrivateFieldRegex = EditorGUILayout.TextField("Private field regex", settings.CodingGuidelines.PrivateFieldRegex);
+            settings.CodingGuidelines.PublicFieldRegex = EditorGUILayout.TextField("Public field regex", settings.CodingGuidelines.PublicFieldRegex);
+            settings.CodingGuidelines.ProtectedFieldRegex = EditorGUILayout.TextField("Protected field regex", settings.CodingGuidelines.ProtectedFieldRegex);
+            settings.CodingGuidelines.StaticFieldRegex = EditorGUILayout.TextField("Static field regex", settings.CodingGuidelines.StaticFieldRegex);
+            settings.CodingGuidelines.ConstFieldRegex = EditorGUILayout.TextField("Const field regex", settings.CodingGuidelines.ConstFieldRegex);
+            settings.CodingGuidelines.PropertieRegex = EditorGUILayout.TextField("Propertie regex", settings.CodingGuidelines.PropertieRegex);
+            settings.CodingGuidelines.ClassNameRegex = EditorGUILayout.TextField("Class regex", settings.CodingGuidelines.ClassNameRegex);
+
+            EditorGUILayout.EndVertical();
         }
 
         private void DrawUnwantedCodeTag()

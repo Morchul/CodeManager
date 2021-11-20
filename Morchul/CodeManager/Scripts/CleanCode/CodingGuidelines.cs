@@ -12,9 +12,9 @@ namespace Morchul.CodeManager
         public string PrivateFieldRegex;
         public string PublicFieldRegex;
         public string ProtectedFieldRegex;
-        public string PropertieRegex;
-        public string ClassNameRegex;
         public string ConstFieldRegex;
         public string StaticFieldRegex;
+        public string PropertieRegex;
+        public string ClassNameRegex;
     }
 }

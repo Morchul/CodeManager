@@ -92,8 +92,11 @@ namespace Morchul.CodeManager
         /// <returns>The selected folder path or defaultPath if no valid path is selected</returns>
         public static string SelectFolderInAssets(string defaultPath)
         {
-            string path = EditorUtility.OpenFolderPanel("Select Folder", "", "");
+            string path = EditorUtility.OpenFolderPanel("Select Folder", "Assets/Scripts", "");
             CodeInspection pathInspection = CodeInspector.InspectText(path);
+
+            if (string.IsNullOrEmpty(path)) return defaultPath;
+
             if(pathInspection.Find(@"Assets\/", out InspectionPart part))
             {
                 pathInspection.DeleteBefore(part);
