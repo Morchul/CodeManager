@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Morchul.CodeManager
+{
+    [System.Serializable]
+    public struct CodingGuidelines
+    {
+        public bool NewLineBeforeOpeningCurlyBrackets;
+
+        public string PrivateFieldRegex;
+        public string PublicFieldRegex;
+        public string ProtectedFieldRegex;
+        public string PropertieRegex;
+        public string ClassNameRegex;
+        public string ConstFieldRegex;
+        public string StaticFieldRegex;
+    }
+}
