@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da8bc3cfbe6e4354fba747d8ed4fc716, type: 3}
   m_Name: CleanCodeSettings
   m_EditorClassIdentifier: 
-  DocumentationFlag: 3
+  DocumentationFlag: 7
   UnwantedCodes:
   - Name: Empty methods
     Regex: .*
   CodingGuidelines:
-    NewLineBeforeOpeningCurlyBrackets: 0
+    NewLineBeforeOpeningCurlyBrackets: 1
     PrivateFieldRegex: 
     PublicFieldRegex: 
     ProtectedFieldRegex: 
-    PropertieRegex: 
-    ClassNameRegex: 
     ConstFieldRegex: 
     StaticFieldRegex: 
+    PropertieRegex: 
+    ClassNameRegex: 

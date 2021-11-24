@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -125,7 +126,7 @@ namespace Morchul.CodeManager
             {
                 //Replace all placeholders
                 CodeInspection codeInspection = CodeInspector.InspectText(scriptTemplate.Template.text);
-                codeInspection.FindAll(@"%.*%", out InspectionPart[] foundPlaceholders);
+                codeInspection.FindAll(@"%.*%", out LinkedListNode<CodePiece>[] foundPlaceholders);
 
                 if (foundPlaceholders.Length > 0)
                 {
@@ -137,17 +138,16 @@ namespace Morchul.CodeManager
 
                     for (int i = 0; i < foundPlaceholders.Length; ++i)
                     {
-                        InspectionPart inspectionPart = foundPlaceholders[i];
+                        CodePiece inspectionPart = foundPlaceholders[i].Value;
 
-                        string placeHolderName = inspectionPart.CodePiece.Substring(1, inspectionPart.CodePiece.Length - 2);
+                        string placeHolderName = inspectionPart.Code.Substring(1, inspectionPart.Code.Length - 2);
                         string placeHolderValue = FindPlaceholderValue(placeHolderName, placeholderValues);
                         if (string.IsNullOrEmpty(placeHolderValue))
                         {
                             Debug.LogError("Can't create script. Can't find a placeholder value for: " + placeHolderName);
                             return;
                         }
-                        inspectionPart.CodePiece = placeHolderValue;
-                        codeInspection.Replace(inspectionPart);
+                        inspectionPart.Code = placeHolderValue;
                     }
 
                     codeInspection.Commit();

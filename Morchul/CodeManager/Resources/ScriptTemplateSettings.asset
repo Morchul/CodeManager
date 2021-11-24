@@ -12,5 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 558d5221976c6dd4886718d16386b447, type: 3}
   m_Name: ScriptTemplateSettings
   m_EditorClassIdentifier: 
-  ScriptFolders: []
+  ScriptFolders:
+  - Name: New Folder
+    Path: Assets/Scripts/
+    ScanFor: -1
+  - Name: New Folder
+    Path: Assets/Scripts/
+    ScanFor: 31
   Placeholders: []

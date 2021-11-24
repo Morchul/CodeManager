@@ -52,7 +52,7 @@ namespace Morchul.CodeManager
                     Debug.LogWarning("Can't load template file: " + correctTemplatePath);
                     continue;
                 }
-                string name = CodeManagerUtility.GetFileNameInPathWithoutExtension(correctTemplatePath);
+                string name = CodeManagerEditorUtility.GetFileNameInPathWithoutExtension(correctTemplatePath);
 
                 scriptTemplateList.Add(new ScriptTemplate(textAsset, name));
             }

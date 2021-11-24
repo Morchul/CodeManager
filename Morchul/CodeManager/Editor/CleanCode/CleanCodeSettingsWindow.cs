@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,7 +15,7 @@ namespace Morchul.CodeManager
 
         private Vector2 scrollPos;
 
-        private string[] tabNames = new string[] { "Documentation", "Code guidelines", "Unwanted Code" };
+        private string[] tabNames = new string[] { "Code guidelines", "Unwanted Code" };
         private int selectedTab;
 
         private const float MIN_WIDTH = 200;
@@ -89,7 +87,7 @@ namespace Morchul.CodeManager
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), regexProperty, GUIContent.none);
 
                         //Add errorbox by wrong path name
-                        if (!CodeManagerUtility.IsValidRegex(regexProperty.stringValue))
+                        if (!CodeManagerEditorUtility.IsValidRegex(regexProperty.stringValue))
                         {
                             rect.y += list.LIST_ELEMENT_HEIGHT;
                             EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, 40), "Invalid Regex!", MessageType.Error);
@@ -103,7 +101,7 @@ namespace Morchul.CodeManager
                         SerializedProperty unwantedCode = list.serializedProperty.GetArrayElementAtIndex(index);
                         SerializedProperty regexProperty = unwantedCode.FindPropertyRelative("Regex");
 
-                        if (!CodeManagerUtility.IsValidRegex(regexProperty.stringValue))
+                        if (!CodeManagerEditorUtility.IsValidRegex(regexProperty.stringValue))
                         {
                             list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 3 + 40;
                         }
@@ -136,37 +134,12 @@ namespace Morchul.CodeManager
 
             switch (selectedTab)
             {
-                case 0: DrawDocumentationTab(); break;
-                case 1: DrawCodeGuideLinesTab(); break;
-                case 2: DrawUnwantedCodeTag(); break;
+                case 0: DrawCodeGuideLinesTab(); break;
+                case 1: DrawUnwantedCodeTag(); break;
             }
             
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
-        }
-
-        private void DrawDocumentationTab()
-        {
-            EditorGUILayout.BeginVertical();
-
-            EditorGUILayout.LabelField("Documentation required for:");
-            ChangeDocumentationFlag(DocumentationFlags.FIELDS, EditorGUILayout.Toggle("Fields", settings.IsFlagSet(DocumentationFlags.FIELDS)));
-            ChangeDocumentationFlag(DocumentationFlags.METHODS, EditorGUILayout.Toggle("Methods", settings.IsFlagSet(DocumentationFlags.METHODS)));
-            ChangeDocumentationFlag(DocumentationFlags.CLASSES, EditorGUILayout.Toggle("Classes", settings.IsFlagSet(DocumentationFlags.CLASSES)));
-
-            EditorGUILayout.EndVertical();
-        }
-
-        private void ChangeDocumentationFlag(DocumentationFlags flag, bool setFlag)
-        {
-            if (setFlag)
-            {
-                settings.DocumentationFlag |= flag;
-            }
-            else
-            {
-                settings.DocumentationFlag &= ~flag;
-            }
         }
 
         private void DrawCodeGuideLinesTab()
@@ -187,6 +160,7 @@ namespace Morchul.CodeManager
             settings.CodingGuidelines.ConstFieldRegex = EditorGUILayout.TextField("Const field regex", settings.CodingGuidelines.ConstFieldRegex);
             settings.CodingGuidelines.PropertieRegex = EditorGUILayout.TextField("Propertie regex", settings.CodingGuidelines.PropertieRegex);
             settings.CodingGuidelines.ClassNameRegex = EditorGUILayout.TextField("Class regex", settings.CodingGuidelines.ClassNameRegex);
+            settings.CodingGuidelines.MethodNameRegex = EditorGUILayout.TextField("Method regex", settings.CodingGuidelines.MethodNameRegex);
 
             EditorGUILayout.EndVertical();
         }

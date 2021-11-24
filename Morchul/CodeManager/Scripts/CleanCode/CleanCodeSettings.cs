@@ -6,13 +6,7 @@ namespace Morchul.CodeManager
 {
     public class CleanCodeSettings : ScriptableObject
     {
-        public DocumentationFlags DocumentationFlag;
         public UnwantedCode[] UnwantedCodes;
-        public CodingGuidelines CodingGuidelines;
-
-        public bool IsFlagSet(DocumentationFlags flag)
-        {
-            return (DocumentationFlag & flag) > 0;
-        }
+        public CodingGuideline CodingGuidelines;
     }
 }

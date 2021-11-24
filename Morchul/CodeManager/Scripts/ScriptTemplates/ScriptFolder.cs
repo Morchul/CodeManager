@@ -8,7 +8,7 @@ namespace Morchul.CodeManager
     {
         public string Name;
         public string Path;
-        public bool Scan;
+        public ScanForFlags ScanFor;
 
         public bool IsNull()
         {

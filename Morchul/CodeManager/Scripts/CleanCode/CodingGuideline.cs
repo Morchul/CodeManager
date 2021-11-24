@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Morchul.CodeManager
 {
     [System.Serializable]
-    public struct CodingGuidelines
+    public struct CodingGuideline
     {
         public bool NewLineBeforeOpeningCurlyBrackets;
 
@@ -16,5 +16,6 @@ namespace Morchul.CodeManager
         public string StaticFieldRegex;
         public string PropertieRegex;
         public string ClassNameRegex;
+        public string MethodNameRegex;
     }
 }

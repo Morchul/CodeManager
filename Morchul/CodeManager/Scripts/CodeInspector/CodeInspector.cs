@@ -69,11 +69,12 @@ namespace Morchul.CodeManager
         public static void StopFileInspection(CodeInspection codeInspection)
         {
             if (codeInspection.Type == InspectionType.TEXT) return;
+            if (codeInspection.CodeInspectionID == 0) return;
 
             if (fileBlockings.RemoveAll(fb => fb.CodeInspectionID == codeInspection.CodeInspectionID) > 0)
                 codeInspection.SetInactive();
             else
-                Debug.LogError("The CodeInspection could not be removed.");
+                Debug.LogError("The CodeInspection + [" + codeInspection.CodeInspectionID + "] could not be removed.");
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-
+using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -6,22 +7,10 @@ using UnityEngine;
 namespace Morchul.CodeManager
 {
     /// <summary>
-    /// Utility class for CodeManager
+    /// Utility class for CodeManager using UnityEditor
     /// </summary>
-    public static class CodeManagerUtility
+    public static class CodeManagerEditorUtility
     {
-        #region const Paths and FolderNames
-        public const string CodeManagerPath = "Assets/Plugins/Morchul/CodeManager/";
-        public const string CodeManagerResourcePath = CodeManagerPath + "Resources/";
-        public const string ScriptTemplatePath = ScriptTemplateFolderPath + "/";
-        public const string ScriptTemplateSettingsObject = CodeManagerResourcePath + "ScriptTemplateSettings.asset";
-        public const string CleanCodeSettingsObject = CodeManagerResourcePath + "CleanCodeSettings.asset";
-
-        public const string ScriptTemplateFolder = "ScriptTemplates";
-
-        public const string ScriptTemplateFolderPath = "Assets/" + ScriptTemplateFolder;
-        #endregion
-
         /// <summary>
         /// Returns the folder name of the path
         /// Assets/Scripts/Controller.cs => Assets/Scripts/
@@ -97,9 +86,9 @@ namespace Morchul.CodeManager
 
             if (string.IsNullOrEmpty(path)) return defaultPath;
 
-            if(pathInspection.Find(@"Assets\/", out InspectionPart part))
+            if(pathInspection.Find(@"Assets\/", out LinkedListNode<CodePiece> part))
             {
-                pathInspection.DeleteBefore(part);
+                part.Previous.Value.Code = "";
                 pathInspection.Commit();
                 path = pathInspection.CompleteCode;
                 return path + "/";

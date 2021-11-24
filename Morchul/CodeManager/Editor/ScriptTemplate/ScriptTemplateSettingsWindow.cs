@@ -60,7 +60,7 @@ namespace Morchul.CodeManager
                 {
                     element.FindPropertyRelative("Name").stringValue = "New Folder";
                     element.FindPropertyRelative("Path").stringValue = "Assets/Scripts/";
-                    element.FindPropertyRelative("Scan").boolValue = true;
+                    element.FindPropertyRelative("ScanFor").intValue = (int)ScanForFlags.Everything;
                 },
 
                 onElementDrawCallback = (Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list) =>
@@ -68,6 +68,7 @@ namespace Morchul.CodeManager
                     SerializedProperty scriptFolder = list.serializedProperty.GetArrayElementAtIndex(index);
                     SerializedProperty nameProperty = scriptFolder.FindPropertyRelative("Name");
                     SerializedProperty pathProperty = scriptFolder.FindPropertyRelative("Path");
+                    SerializedProperty documentationFlags = scriptFolder.FindPropertyRelative("ScanFor");
 
                     Rect foldoutRect = rect;
                     if (list.ElementExpanded[index])
@@ -79,11 +80,7 @@ namespace Morchul.CodeManager
                         //Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
                         EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Name");
-                        EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 120, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
-
-                        //Add scan
-                        EditorGUI.LabelField(new Rect(rect.x + rect.width - 60, rect.y, 40, EditorGUIUtility.singleLineHeight), "Scan");
-                        EditorGUI.PropertyField(new Rect(rect.x + rect.width - 20, rect.y, 20, EditorGUIUtility.singleLineHeight), scriptFolder.FindPropertyRelative("Scan"), GUIContent.none);
+                        EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 52, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Add Path
                         rect.y += list.LIST_ELEMENT_HEIGHT;
@@ -93,12 +90,17 @@ namespace Morchul.CodeManager
                         //Add Selectfolder button
                         if (GUI.Button(new Rect(rect.x + rect.width - 90, rect.y, 90, EditorGUIUtility.singleLineHeight), new GUIContent("Select Folder")))
                         {
-                            pathProperty.stringValue = CodeManagerUtility.SelectFolderInAssets(pathProperty.stringValue);
+                            pathProperty.stringValue = CodeManagerEditorUtility.SelectFolderInAssets(pathProperty.stringValue);
                             Repaint();
                         }
 
+                        //Add scan
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 60, EditorGUIUtility.singleLineHeight), "Scan for:");
+                        documentationFlags.intValue = (int)(ScanForFlags)EditorGUI.EnumFlagsField(new Rect(rect.x + 60, rect.y, 220, EditorGUIUtility.singleLineHeight), (ScanForFlags)documentationFlags.intValue);
+
                         //Add errorbox by wrong path name
-                        if (!CodeManagerUtility.IsValidAssetsFolderPath(pathProperty.stringValue))
+                        if (!CodeManagerEditorUtility.IsValidAssetsFolderPath(pathProperty.stringValue))
                         {
                             rect.y += list.LIST_ELEMENT_HEIGHT;
                             EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, 40), "This is not a valid folder path.", MessageType.Error);
@@ -113,13 +115,13 @@ namespace Morchul.CodeManager
                         SerializedProperty scriptFolder = list.serializedProperty.GetArrayElementAtIndex(index);
                         SerializedProperty pathProperty = scriptFolder.FindPropertyRelative("Path");
 
-                        if (!CodeManagerUtility.IsValidAssetsFolderPath(pathProperty.stringValue))
+                        if (!CodeManagerEditorUtility.IsValidAssetsFolderPath(pathProperty.stringValue))
                         {
-                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 3 + 40;
+                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 4 + 40;
                         }
                         else
                         {
-                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 3;
+                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 4;
                         }
                     }
                     else

@@ -27,7 +27,7 @@ namespace Morchul.CodeManager
 
         private static ScriptTemplate scriptTemplate;
 
-        private bool closeWindow;
+        private string errorMessage;
 
         public static void ShowWindow(ScriptTemplate scriptTemplate)
         {
@@ -40,25 +40,25 @@ namespace Morchul.CodeManager
 
         private void LoadScriptFolders()
         {
+            errorMessage = "";
             ScriptTemplateSettings settings = AssetDatabase.LoadAssetAtPath<ScriptTemplateSettings>(CodeManagerUtility.ScriptTemplateSettingsObject);
             if (settings == null)
             {
-                Debug.LogError("There are no settings created yet for Script Templates. Please open Window: Code Manager -> Script Templates -> Settings once to auto create settings.");
-                closeWindow = true;
+                errorMessage = "There are no settings created yet for Script Templates. Please open Window: Code Manager -> Script Templates -> Settings once to auto create settings.";
+                Debug.LogError(errorMessage);
                 return;
             }
             scriptFolders = settings.ScriptFolders;
             if(scriptFolders.Length == 0)
             {
-                Debug.LogError("There is no Scriptfolder created yet. Please create a script folder under: Code Manager -> Script Templates -> Settings.");
-                closeWindow = true;
+                errorMessage = "There is no Scriptfolder created yet. Please create a script folder under: Code Manager -> Script Templates -> Settings.";
+                Debug.LogError(errorMessage);
                 return;
             }
         }
 
         private void OnEnable()
         {
-            closeWindow = false;
             LoadScriptFolders();
             selectedFolderName = "SelectFolder";
             informationText = "";
@@ -72,9 +72,9 @@ namespace Morchul.CodeManager
 
         private void OnGUI()
         {
-            if (closeWindow)
+            if (!string.IsNullOrEmpty(errorMessage))
             {
-                instance.Close();
+                EditorGUILayout.HelpBox(errorMessage, MessageType.Error);
                 return;
             }
             GUILayout.BeginArea(new Rect(BORDER_WIDTH, BORDER_WIDTH, position.width - BORDER_WIDTH * 2, position.height - BORDER_WIDTH * 2));
@@ -95,7 +95,7 @@ namespace Morchul.CodeManager
                 GenericMenu foldersToSelect = new GenericMenu();
                 for (int i = 0; i < scriptFolders.Length; ++i)
                 {
-                    if(CodeManagerUtility.IsValidAssetsFolderPath(scriptFolders[i].Path))
+                    if(CodeManagerEditorUtility.IsValidAssetsFolderPath(scriptFolders[i].Path))
                         foldersToSelect.AddItem(new GUIContent(scriptFolders[i].Name), false, OnFolderSelected, scriptFolders[i]);
                 }
                 foldersToSelect.DropDown(GUILayoutUtility.GetLastRect());
