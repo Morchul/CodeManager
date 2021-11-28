@@ -7,10 +7,10 @@ namespace Morchul.CodeManager
 {
     public class MenuItems
     {
-        [MenuItem("Code Manager/Clean Code/Manager %m")]
+        [MenuItem("Code Manager/Clean Code/Console %m")]
         private static void OpenCleanCodeManager()
         {
-            
+            CleanCodeConsole.ShowWindow();
         }
 
         [MenuItem("Code Manager/Clean Code/Settings")]
@@ -34,7 +34,7 @@ namespace Morchul.CodeManager
 
             AssetDatabase.Refresh();
 
-            string folderPath = CodeManagerEditorUtility.GetFolderNameInPath(path);
+            string folderPath = CodeManagerUtility.GetFolderNameInPath(path);
 
             //Script template must be created in the ScriptTemplate folder
             if (!CodeManagerEditorUtility.IsValidScriptTemplateFolderPath(folderPath))

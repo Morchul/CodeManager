@@ -19,7 +19,7 @@ namespace Morchul.CodeManager
 
         public float LIST_ELEMENT_HEIGHT { get; private set; }
 
-        public CustomReorderableList(SerializedObject serializedObject, SerializedProperty serializedProperty, int initialLength) : base(serializedObject, serializedProperty, true, true, true, true)
+        public CustomReorderableList(SerializedObject serializedObject, SerializedProperty serializedProperty, int initialLength, bool draggable = true) : base(serializedObject, serializedProperty, draggable, false, true, true)
         {
             LIST_ELEMENT_HEIGHT = EditorGUIUtility.singleLineHeight + 5f;
             Expanded = false;
@@ -79,6 +79,7 @@ namespace Morchul.CodeManager
 
         private void RemoveItem(ReorderableList list)
         {
+            onElementRemovedCallback?.Invoke(index);
             UpdateReorderableStatusLists_Remove(list);
             ReorderableList.defaultBehaviours.DoRemoveButton(list);
         }
@@ -91,6 +92,9 @@ namespace Morchul.CodeManager
 
         public ElementeDrawCallback onElementDrawCallback;
         public delegate void ElementeDrawCallback(Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list);
+
+        public ElementRemovedCallback onElementRemovedCallback;
+        public delegate void ElementRemovedCallback(int index);
     }
 }
 

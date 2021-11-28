@@ -33,6 +33,7 @@ namespace Morchul.CodeManager
 
 
         public string Path { get; private set; }
+        public string FileName { get; private set; }
 
         public string CompleteCode { get; private set; }
 
@@ -61,6 +62,7 @@ namespace Morchul.CodeManager
                     if (pathOrText != "")
                     {
                         Path = pathOrText;
+                        FileName = CodeManagerUtility.GetFileNameInPathWithExtension(Path);
                         if (!ReadFile(Path))
                         {
                             throw new ArgumentException("The file: " + pathOrText + " could not be read!");
@@ -150,13 +152,13 @@ namespace Morchul.CodeManager
         {
             if (Settings.AddLineIndex)
             {
-                int lineCounter = 0;
+                int lineCounter = 1;
                 LinkedListNode<CodePiece> previous = codePieceNode.Previous;
                 //Add the LineCount of previous codePieces.
                 while (previous != null)
                 {
                     //If the previous does not end with new line add one line less than counted
-                    lineCounter += previous.Value.EndWithNewLine ? previous.Value.LineCount : previous.Value.LineCount -1; 
+                    lineCounter += previous.Value.EndWithNewLine ? previous.Value.LineCount : previous.Value.LineCount -1;
                     previous = previous.Previous;
                 }
                 return lineCounter;
@@ -253,16 +255,15 @@ namespace Morchul.CodeManager
         /// Finds all occurents of the regex in the File or Text and returns the information in a CodePiece node array
         /// </summary>
         /// <param name="regex">The Regular expression</param>
-        /// <param name="codePieces"> out The final CodePiece nodes array with all matches will be assigned to this</param>
+        /// <param name="codePieces"> out The final CodePiece nodes array with all matches will be assigned to this. Can be null</param>
         /// <returns>True if there was at least one match</returns>
         public bool FindAll(string regex, out LinkedListNode<CodePiece>[] codePieces)
         {
             if (!HasAllReadRequirements())
             {
-                codePieces = new LinkedListNode<CodePiece>[0];
+                codePieces = null;
                 return false;
             }
-
             MatchCollection matches =
                 (Settings.RegexTimeout == TimeSpan.Zero)
                 ? Regex.Matches(CompleteCode, regex, Settings.RegexOptions)
@@ -369,10 +370,17 @@ namespace Morchul.CodeManager
         /// <returns>True if there is no edit made</returns>
         private bool IsNoEditationActive()
         {
-            if (editationActive && Mode == InspectionMode.READ_WRITE)
+            if (editationActive)
             {
-                Debug.LogError("The current CodeInspection has alredy created CodePieces. To create new ones or change Settings please first call Commit() or Cancel()");
-                return false;
+                if (Mode == InspectionMode.READ_WRITE)
+                {
+                    Debug.LogError("The current CodeInspection has alredy created CodePieces. To create new ones or change Settings please first call Commit() or Cancel()");
+                    return false;
+                }
+                else if(Mode == InspectionMode.READ)
+                {
+                    return Commit();
+                }
             }
             return true;
         }

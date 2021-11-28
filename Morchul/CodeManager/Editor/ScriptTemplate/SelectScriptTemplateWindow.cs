@@ -52,7 +52,7 @@ namespace Morchul.CodeManager
                     Debug.LogWarning("Can't load template file: " + correctTemplatePath);
                     continue;
                 }
-                string name = CodeManagerEditorUtility.GetFileNameInPathWithoutExtension(correctTemplatePath);
+                string name = CodeManagerUtility.GetFileNameInPathWithoutExtension(correctTemplatePath);
 
                 scriptTemplateList.Add(new ScriptTemplate(textAsset, name));
             }
@@ -64,7 +64,7 @@ namespace Morchul.CodeManager
         {
             scriptTemplates = LoadScriptTemplates();
 
-            scriptTemplateImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerUtility.CodeManagerResourcePath + "ScriptTemplateImage.png");
+            scriptTemplateImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.ScriptTemplateImage);
         }
 
         private GUIContent[] GetScriptTemplateGUIContents()
@@ -78,10 +78,10 @@ namespace Morchul.CodeManager
         }
 
         #region Draw
-        private void OnInspectorUpdate()
+        /*private void OnInspectorUpdate()
         {
             Repaint();
-        }
+        }*/
 
         private void OnGUI()
         {

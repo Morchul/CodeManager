@@ -168,8 +168,6 @@ namespace Morchul.CodeManager
         /// </summary>
         private struct FileBlocking
         {
-            internal static readonly FileBlocking Null;
-
             internal uint CodeInspectionID;
             internal string Path;
             internal InspectionMode Mode;

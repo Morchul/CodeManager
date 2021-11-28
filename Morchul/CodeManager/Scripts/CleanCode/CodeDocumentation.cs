@@ -1,11 +1,11 @@
 namespace Morchul.CodeManager
 {
     /// <summary>
-    /// An UnwantedCode is build the follow:
-    /// If the search with the Regex find somthing a CleanCodeVioletion will be created for this unwanted code
+    /// A CodeDocumentation is build the follow:
+    /// If the search with the Regex returns a Result the Code Part before the match will be checked with the DocumentationRegex in CleanCodeSettings if there is no match a CleanCodeViolation will be created.
     /// </summary>
     [System.Serializable]
-    public struct UnwantedCode : IScanable
+    public struct CodeDocumentation : IScanable
     {
         public string Name;
         public int RegexIndex;
@@ -13,11 +13,6 @@ namespace Morchul.CodeManager
         public string Description;
 
         public int ID;
-
-        public bool IsValid()
-        {
-            return RegexIndex >= 0;
-        }
 
         public int GetID()
         {
@@ -29,6 +24,11 @@ namespace Morchul.CodeManager
             return Name;
         }
 
+        public bool IsValid()
+        {
+            return RegexIndex >= 0;
+        }
+
         public void SetID(int ID)
         {
             this.ID = ID;
@@ -36,7 +36,7 @@ namespace Morchul.CodeManager
 
         IScanable.ScanableType IScanable.GetType()
         {
-            return IScanable.ScanableType.UnwantedCode;
+            return IScanable.ScanableType.CodeDocumentation;
         }
     }
 }

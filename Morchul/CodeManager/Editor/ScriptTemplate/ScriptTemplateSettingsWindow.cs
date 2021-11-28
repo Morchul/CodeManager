@@ -60,7 +60,6 @@ namespace Morchul.CodeManager
                 {
                     element.FindPropertyRelative("Name").stringValue = "New Folder";
                     element.FindPropertyRelative("Path").stringValue = "Assets/Scripts/";
-                    element.FindPropertyRelative("ScanFor").intValue = (int)ScanForFlags.Everything;
                 },
 
                 onElementDrawCallback = (Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list) =>
@@ -94,10 +93,12 @@ namespace Morchul.CodeManager
                             Repaint();
                         }
 
-                        //Add scan
+                        //Add Scan selection button
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 60, EditorGUIUtility.singleLineHeight), "Scan for:");
-                        documentationFlags.intValue = (int)(ScanForFlags)EditorGUI.EnumFlagsField(new Rect(rect.x + 60, rect.y, 220, EditorGUIUtility.singleLineHeight), (ScanForFlags)documentationFlags.intValue);
+                        if(GUI.Button(new Rect(rect.x, rect.y, 200, EditorGUIUtility.singleLineHeight), "Select scans for this folder"))
+                        {
+                            SelectScansWindow.ShowWindow(settings.ScriptFolders[index]);
+                        }
 
                         //Add errorbox by wrong path name
                         if (!CodeManagerEditorUtility.IsValidAssetsFolderPath(pathProperty.stringValue))

@@ -12,16 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da8bc3cfbe6e4354fba747d8ed4fc716, type: 3}
   m_Name: CleanCodeSettings
   m_EditorClassIdentifier: 
-  DocumentationFlag: 7
   UnwantedCodes:
-  - Name: Empty methods
-    Regex: .*
-  CodingGuidelines:
-    NewLineBeforeOpeningCurlyBrackets: 1
-    PrivateFieldRegex: 
-    PublicFieldRegex: 
-    ProtectedFieldRegex: 
-    ConstFieldRegex: 
-    StaticFieldRegex: 
-    PropertieRegex: 
-    ClassNameRegex: 
+  - Name: Empty Codeblock
+    RegexIndex: 0
+    Description: No empty code blocks allowed.
+    ID: 1
+  CodeGuidelines:
+  - Name: Method Name
+    SearchRegexIndex: 1
+    GroupName: identifier
+    MatchRegexIndex: 5
+    Description: Methods have to start with a capital letter
+    ID: 2
+  - Name: Private field name
+    SearchRegexIndex: 4
+    GroupName: identifier
+    MatchRegexIndex: 6
+    Description: private fields have to start with a lowercase letter
+    ID: 3
+  CodeDocumentations:
+  - Name: Documentation on class
+    RegexIndex: 2
+    Description: Classes must be documented
+    ID: 4
+  DocumentationRegex:
+    Name: 
+    Regex: '[^\S][\/]{2,3}.*\n?$'
+  Regexes:
+  - Name: Empty Codeblock regex
+    Regex: \{\s*\}
+  - Name: Method regex
+    Regex: \b(public\s*|private\s*|protected\s*|internal\s*)?\b(async\s*)?\b(static\s*|virtual\s*|abstract\s*|readonly\s*|const\s*)?\b([A-Za-z0-9_\[\]\<\>]+)\s*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)\s*(\<[A-Z]\>)?\s*\(\s*((params)?\s*(\b[A-Za-z_][A-Za-z_0-9\[\]\<\>]*)\s*(\b[A-Za-z_][A-Za-z_0-9]*)\s*\,?\s*)*\s*\)
+  - Name: Class regex
+    Regex: .*class.*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)
+  - Name: Field regex
+    Regex: \b(public\s*|private\s*|protected\s*|internal\s*)?\b(static\s*|virtual\s*|abstract\s*|readonly\s*|const\s*)?\b([A-Za-z0-9_\[\]\<\>]+)\s*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)
+  - Name: Private Field regex
+    Regex: \b(private\s*)\b(static\s*|virtual\s*|abstract\s*|readonly\s*|const\s*)?\b([A-Za-z0-9_\[\]\<\>]+)\s*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)
+  - Name: Method Name regex
+    Regex: \b[A-Z][a-zA-Z_0-9]*
+  - Name: Private field name regex
+    Regex: \b[a-z][a-zA-Z_0-9]*

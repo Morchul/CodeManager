@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ScriptFolders:
   - Name: New Folder
-    Path: Assets/Scripts/
-    ScanFor: -1
-  - Name: New Folder
-    Path: Assets/Scripts/
-    ScanFor: 31
-  Placeholders: []
+    Path: Assets/Scripts/Player/
+    ScanFor: 0200000003000000
+  Placeholders:
+  - Name: namespace
+    Value: Morchul.CodeManager

@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace Morchul.CodeManager
 {
@@ -19,18 +20,31 @@ namespace Morchul.CodeManager
         public const string ScriptTemplateFolderPath = "Assets/" + ScriptTemplateFolder;
         #endregion
 
-        #region Regexes
-        public const string FieldRegex = @"";
-        public const string MethodRegex = @"\b(?<access>public|private|protected|internal)\s*\b(async)?\s*(?<modifier>static|virtual|abstract)?\s*\b(?<return>[A-Za-z0-9_\[\]\<\>]+)\s*\b(?<method>[A-Za-z_][A-Za-z_0-9]*\s*)(?<generic>\<[A-Z]\>)?\(\s*((params)?\s*(\b[A-Za-z_][A-Za-z_0-9\[\]\<\>]*)\s*(\b[A-Za-z_][A-Za-z_0-9]*)\s*\,?\s*)*\s*\)";
-        public const string ClassRegex = @"";
-        #endregion
-
         public static string ConvertToOpertingSystemPath(string str)
         {
             if (str[str.Length - 1] == '/')
                 return str.Remove(str.Length - 1);
             else
                 return str;
+        }
+
+        /// <summary>
+        /// Checks if a regex is valid or not
+        /// </summary>
+        /// <param name="regex">The regex which should be tested</param>
+        /// <returns>True if the regex is valid</returns>
+        public static bool IsValidRegex(string regex)
+        {
+            if (string.IsNullOrEmpty(regex)) return false;
+            try
+            {
+                Regex.IsMatch("", regex);
+                return true;
+            }
+            catch (System.ArgumentException)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -57,6 +71,40 @@ namespace Morchul.CodeManager
 
             lineCount = count;
             return endWithNewLine;
+        }
+
+        /// <summary>
+        /// Returns the folder name of the path
+        /// Assets/Scripts/Controller.cs => Assets/Scripts/
+        /// </summary>
+        /// <param name="path">The path</param>
+        /// <returns>the folder path</returns>
+        public static string GetFolderNameInPath(string path)
+        {
+            return path.Substring(0, path.LastIndexOf('/') + 1);
+        }
+
+        /// <summary>
+        /// Returns file name with extension
+        /// Assets/Scripts/Controller.cs => Controller.cs
+        /// </summary>
+        /// <param name="path">The path to file</param>
+        /// <returns>Script name with extension</returns>
+        public static string GetFileNameInPathWithExtension(string path)
+        {
+            return path.Substring(path.Replace("\\", "/").LastIndexOf('/') + 1);
+        }
+
+        /// <summary>
+        /// Returns file name without extension
+        /// Assets/Scripts/Controller.cs => Controller
+        /// </summary>
+        /// <param name="path">The path to file</param>
+        /// <returns>Script name without extension</returns>
+        public static string GetFileNameInPathWithoutExtension(string path)
+        {
+            string nameWithExtension = GetFileNameInPathWithExtension(path);
+            return nameWithExtension.Substring(0, nameWithExtension.LastIndexOf('.'));
         }
     }
 }

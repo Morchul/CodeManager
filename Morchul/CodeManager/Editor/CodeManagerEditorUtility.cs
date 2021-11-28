@@ -11,39 +11,13 @@ namespace Morchul.CodeManager
     /// </summary>
     public static class CodeManagerEditorUtility
     {
-        /// <summary>
-        /// Returns the folder name of the path
-        /// Assets/Scripts/Controller.cs => Assets/Scripts/
-        /// </summary>
-        /// <param name="path">The path</param>
-        /// <returns>the folder path</returns>
-        public static string GetFolderNameInPath(string path)
-        {
-            return path.Substring(0, path.LastIndexOf('/') + 1);
-        }
 
-        /// <summary>
-        /// Returns file name with extension
-        /// Assets/Scripts/Controller.cs => Controller.cs
-        /// </summary>
-        /// <param name="path">The path to file</param>
-        /// <returns>Script name with extension</returns>
-        public static string GetFileNameInPathWithExtension(string path)
-        {
-            return path.Substring(path.LastIndexOf('/') + 1);
-        }
-
-        /// <summary>
-        /// Returns file name without extension
-        /// Assets/Scripts/Controller.cs => Controller
-        /// </summary>
-        /// <param name="path">The path to file</param>
-        /// <returns>Script name without extension</returns>
-        public static string GetFileNameInPathWithoutExtension(string path)
-        {
-            string nameWithExtension = GetFileNameInPathWithExtension(path);
-            return nameWithExtension.Substring(0, nameWithExtension.LastIndexOf('.'));
-        }
+        #region Image Paths
+        public const string ScriptTemplateImage = CodeManagerUtility.CodeManagerResourcePath + "ScriptTemplateImage.png";
+        public const string UnwantedCodeImage = CodeManagerUtility.CodeManagerResourcePath + "UnwantedCodeImage.PNG";
+        public const string CodeGuidelineImage = CodeManagerUtility.CodeManagerResourcePath + "CodeGuidelineImage.png";
+        public const string DocumentationImage = CodeManagerUtility.CodeManagerResourcePath + "CodeDocumentationImage.png";
+        #endregion
 
         /// <summary>
         /// Tests if path points to a folder under Assets which already exists
@@ -97,25 +71,6 @@ namespace Morchul.CodeManager
             {
                 Debug.LogError("Please select a folder under Assets/...");
                 return defaultPath;
-            }
-        }
-
-        /// <summary>
-        /// Checks if a regex is valid or not
-        /// </summary>
-        /// <param name="regex">The regex which should be tested</param>
-        /// <returns>True if the regex is valid</returns>
-        public static bool IsValidRegex(string regex)
-        {
-            if (string.IsNullOrEmpty(regex)) return false;
-            try
-            {
-                Regex.IsMatch("", regex);
-                return true;
-            }
-            catch (System.ArgumentException)
-            {
-                return false;
             }
         }
     }

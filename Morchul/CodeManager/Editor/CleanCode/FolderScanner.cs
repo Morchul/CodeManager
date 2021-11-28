@@ -10,86 +10,181 @@ namespace Morchul.CodeManager
     public class FolderScanner
     {
         private ScriptFolder scriptFolder;
-        private CleanCodeSettings cleanCodeSettings;
+        private readonly CleanCodeSettings cleanCodeSettings;
 
-        public FolderScanner(ScriptFolder scriptFolder, CleanCodeSettings cleanCodeSettings)
+        private static Texture2D unwantedCodeImage;
+        private static Texture2D codeGuidelineImage;
+        private static Texture2D documentationImage;
+
+        private readonly Dictionary<int, LinkedListNode<CodePiece>[]> searchedRegexes;
+
+        public FolderScanner(CleanCodeSettings cleanCodeSettings)
         {
-            this.scriptFolder = scriptFolder;
             this.cleanCodeSettings = cleanCodeSettings;
+            searchedRegexes = new Dictionary<int, LinkedListNode<CodePiece>[]>();
         }
 
-        public CleanCodeViolation[] Scan()
+        public CleanCodeViolation[] ScanFolder(ScriptFolder scriptFolder)
         {
-            if (scriptFolder.ScanFor == 0) return null; //Do not scan this folder
+            this.scriptFolder = scriptFolder;
+            searchedRegexes.Clear();
 
-            string[] scriptNames = Directory.GetFiles(CodeManagerUtility.ConvertToOpertingSystemPath(scriptFolder.Path), "*.cs", SearchOption.TopDirectoryOnly);
+            if (scriptFolder.ScanFor.Count == 0 || cleanCodeSettings.scanables == null) return null; //Do not scan this folder
+
+            List<CleanCodeViolation> ccvs = new List<CleanCodeViolation>();
+            string[] scriptNames = GetAllSriptNames();
+
+            //For every script
             for(int i = 0; i < scriptNames.Length; ++i)
             {
+                //Start CodeInspection
                 CodeInspection scriptInspection = CodeInspector.InspectFile(scriptNames[i], InspectionMode.READ);
+                scriptInspection.Settings = new CodeInspectionSettings()
+                {
+                    AddLineIndex = true,
+                    RegexTimeout = System.TimeSpan.Zero,
+                    RegexOptions = RegexOptions.None
+                };
+
                 Object scriptObj = AssetDatabase.LoadAssetAtPath<TextAsset>(scriptNames[i]);
 
-                if (scriptFolder.ScanFor.HasFlag(ScanForFlags.Unwanted_Code))
-                {
-                    ScanForUnwantedCode(scriptInspection, scriptObj);
-                }
+                CleanCodeViolation[] ccv;
 
-                if(scriptFolder.ScanFor.HasFlag(ScanForFlags.Code_Guidelines) || scriptFolder.ScanFor.HasFlag(ScanForFlags.Documentation_on_Methods))
+                //Scan for every scanable
+                foreach (int scanableID in scriptFolder.ScanFor)
                 {
-                    ScanForMethods(scriptInspection, scriptObj);
+                    if(cleanCodeSettings.scanables.TryGetValue(scanableID, out IScanable scanable))
+                    {
+                        
+                        switch (scanable.GetType())
+                        {
+                            case IScanable.ScanableType.CodeDocumentation:
+                                ccv = ScanCodeDocumentation((CodeDocumentation)scanable, scriptInspection, scriptObj);
+                                if (ccv != null)
+                                    ccvs.AddRange(ccv);
+                                break;
+                            case IScanable.ScanableType.UnwantedCode:
+                                ccv = ScanUnwantedCode((UnwantedCode)scanable, scriptInspection, scriptObj);
+                                if (ccv != null)
+                                    ccvs.AddRange(ccv);
+                                break;
+                            case IScanable.ScanableType.CodingGuideline:
+                                ccv = ScanCodeGuideline((CodeGuideline)scanable, scriptInspection, scriptObj);
+                                if (ccv != null)
+                                    ccvs.AddRange(ccv);
+                                break;
+                        }
+                    }
                 }
             }
 
+            return ccvs.ToArray();
+        }
+
+        private CleanCodeViolation[] ScanUnwantedCode(UnwantedCode unwantedCode, CodeInspection scriptInspection, Object script)
+        {
+            if(FindAll(unwantedCode.RegexIndex, scriptInspection, out LinkedListNode<CodePiece>[] codePieces))
+            {
+                if (codePieces == null) return null;
+
+                CleanCodeViolation[] ccvs = new CleanCodeViolation[codePieces.Length];
+                for(int i = 0; i < ccvs.Length; ++i)
+                {
+                    ccvs[i] = CleanCodeViolation.CreateUnwantedCodeMessage(scriptInspection.GetLineIndex(codePieces[i]), script, unwantedCode.Description, scriptInspection.FileName, GetUnwantedCodeImage());
+                }
+
+                return ccvs;
+            }
             return null;
         }
 
-        private List<CleanCodeViolation> ScanForMethods(CodeInspection scriptInspection, Object scriptObj)
+        private CleanCodeViolation[] ScanCodeDocumentation(CodeDocumentation codeDocumentation, CodeInspection scriptInspection, Object script)
         {
-            List<CleanCodeViolation> cleanCodeViolations = new List<CleanCodeViolation>();
-
-            if (scriptInspection.FindAll(CodeManagerUtility.MethodRegex, out LinkedListNode<CodePiece>[] inspectionParts))
+            if (FindAll(codeDocumentation.RegexIndex, scriptInspection, out LinkedListNode<CodePiece>[] codePieces))
             {
-                foreach (LinkedListNode<CodePiece> codePieceNode in inspectionParts)
+                if (codePieces == null) return null;
+
+                List<CleanCodeViolation> ccvs = new List<CleanCodeViolation>();
+                for (int i = 0; i < codePieces.Length; ++i)
                 {
-                    if (scriptFolder.ScanFor.HasFlag(ScanForFlags.Code_Guidelines))
+                    //Check if documented
+                    LinkedListNode<CodePiece> codePiece = codePieces[i];
+                    if (codePiece.Previous == null || !Regex.IsMatch(codePiece.Previous.Value.Code, cleanCodeSettings.DocumentationRegex.Regex))
                     {
-                        string methodName = codePieceNode.Value.Match.Groups["method"].Value;
-                        if (!Regex.IsMatch(methodName, cleanCodeSettings.CodingGuidelines.MethodNameRegex))
-                        {
-                            //CleanCodeViolation.Create
-                        }
-                    }
-
-                    if (scriptFolder.ScanFor.HasFlag(ScanForFlags.Code_Guidelines))
-                    {
-                        string methodName = codePieceNode.Value.Match.Groups["method"].Value;
-                        if (Regex.IsMatch(methodName, cleanCodeSettings.CodingGuidelines.MethodNameRegex))
-                        {
-
-                        }
+                        ccvs.Add(CleanCodeViolation.CreateCodeDocumentationMessage(scriptInspection.GetLineIndex(codePieces[i]), script, codeDocumentation.Description, scriptInspection.FileName, GetCodeDocumentationImage()));
                     }
                 }
+
+                return ccvs.ToArray();
             }
-
-
-            return cleanCodeViolations;
+            return null;
         }
 
-        private List<CleanCodeViolation> ScanForUnwantedCode(CodeInspection scriptInspection, Object scriptObj)
+        private CleanCodeViolation[] ScanCodeGuideline(CodeGuideline codeGuideline, CodeInspection scriptInspection, Object script)
         {
-            List<CleanCodeViolation> cleanCodeViolations = new List<CleanCodeViolation>();
-            foreach (UnwantedCode unwantedCode in cleanCodeSettings.UnwantedCodes)
+            if (FindAll(codeGuideline.SearchRegexIndex, scriptInspection, out LinkedListNode<CodePiece>[] codePieces))
             {
-                if (scriptInspection.FindAll(unwantedCode.Regex, out LinkedListNode<CodePiece>[] inspectionParts))
+                if (codePieces == null) return null;
+
+                List<CleanCodeViolation> ccvs = new List<CleanCodeViolation>();
+                for (int i = 0; i < codePieces.Length; ++i)
                 {
-                    foreach(LinkedListNode<CodePiece> codePieceNode in inspectionParts)
+                    //Check if documented
+                    LinkedListNode<CodePiece> codePiece = codePieces[i];
+                    string groupValue = codePiece.Value.Match.Groups[codeGuideline.GroupName].Value;
+
+                    if (!Regex.IsMatch(groupValue, cleanCodeSettings.Regexes[codeGuideline.MatchRegexIndex].Regex))
                     {
-                        cleanCodeViolations.Add(
-                            CleanCodeViolation.CreateUnwantedCodeMessage(codePieceNode.Value.LineCount, scriptObj, CodeManagerEditorUtility.GetFileNameInPathWithExtension(scriptInspection.Path))
-                        );
+                        ccvs.Add(CleanCodeViolation.CreateCodeGuidelineMessage(scriptInspection.GetLineIndex(codePieces[i]), script, codeGuideline.Description, scriptInspection.FileName, GetCodeGuidelineImage()));
                     }
                 }
+
+                return ccvs.ToArray();
             }
-            return cleanCodeViolations;
+            return null;
+        }
+
+        //A FindAll wrapper to save already searched Regexes so you don't need to search the same regex twice
+        private bool FindAll(int regexIndex, CodeInspection scriptInspection, out LinkedListNode<CodePiece>[] searchResult)
+        {
+            if (searchedRegexes.TryGetValue(regexIndex, out searchResult))
+            {
+                return true;
+            }
+
+            if (scriptInspection.FindAll(cleanCodeSettings.Regexes[regexIndex].Regex, out searchResult))
+            {
+                searchedRegexes.Add(regexIndex, searchResult);
+                return true;
+            }
+
+            return false;
+        }
+
+        private string[] GetAllSriptNames()
+        {
+            return Directory.GetFiles(CodeManagerUtility.ConvertToOpertingSystemPath(scriptFolder.Path), "*.cs", SearchOption.TopDirectoryOnly);
+        }
+
+        private Texture2D GetUnwantedCodeImage()
+        {
+            if(unwantedCodeImage == null)
+                unwantedCodeImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.UnwantedCodeImage);
+            return unwantedCodeImage;
+        }
+
+        private Texture2D GetCodeDocumentationImage()
+        {
+            if (documentationImage == null)
+                documentationImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.DocumentationImage);
+            return documentationImage;
+        }
+
+        private Texture2D GetCodeGuidelineImage()
+        {
+            if (codeGuidelineImage == null)
+                codeGuidelineImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.CodeGuidelineImage);
+            return codeGuidelineImage;
         }
     }
 }
