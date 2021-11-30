@@ -105,17 +105,17 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Name");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Unwanted Code and will be shown in the scanables in the ScriptFolders"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Description
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), "Description");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), new GUIContent("Description","The description will be displayed in the CleanCode Console if a UnwantedCode Violation appears to show the user what is wrong."));
                         EditorGUI.PropertyField(new Rect(rect.x + 70, rect.y, rect.width - 70, EditorGUIUtility.singleLineHeight), unwantedCode.FindPropertyRelative("Description"), GUIContent.none);
 
                         //Third add Regex
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Regex");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Regex", "If this regex matches something in the code a UnwantedCode message will be displayed in the CleanCode Console."));
                         if(regexProperty.intValue < 0)
                         {
                             Color defaultColor = GUI.backgroundColor;
@@ -172,17 +172,17 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Name");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Code Documentation and will be shown in the scanables in the ScriptFolders"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Description
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), "Description");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), new GUIContent("Description", "The description will be displayed in the CleanCode Console if a Code documentation violation appears to show the user what is wrong."));
                         EditorGUI.PropertyField(new Rect(rect.x + 70, rect.y, rect.width - 70, EditorGUIUtility.singleLineHeight), codeDocumentation.FindPropertyRelative("Description"), GUIContent.none);
 
                         //Third add Regex
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Regex");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Regex", "This Regex searches for the Code which has to be documented. If something is found the text before will be tested with the Documentation Regex"));
                         if (regexProperty.intValue < 0)
                         {
                             Color defaultColor = GUI.backgroundColor;
@@ -243,17 +243,17 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Name");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Code Guideline and will be shown in the scanables in the ScriptFolders"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Description
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), "Description");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), new GUIContent("Description", "The description will be displayed in the CleanCode Console if a CodeGuideline violation appears to show the user what is wrong."));
                         EditorGUI.PropertyField(new Rect(rect.x + 70, rect.y, rect.width - 70, EditorGUIUtility.singleLineHeight), codeGuideline.FindPropertyRelative("Description"), GUIContent.none);
 
                         //Third add SearchRegex and GroupName
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), "Search Regex");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), new GUIContent("Search Regex", "This Regex searches for the Code which has to be checked for Code guideline. If something is found the text marked by the GroupName will be checked with the Match Regex."));
                         
                         if (searchRegexProperty.intValue < 0)
                         {
@@ -267,7 +267,7 @@ namespace Morchul.CodeManager
                             searchRegexProperty.intValue = EditorGUI.Popup(new Rect(rect.x + 90, rect.y, 300, EditorGUIUtility.singleLineHeight), searchRegexProperty.intValue, regexNames);
                         }
 
-                        EditorGUI.LabelField(new Rect(rect.x + 400, rect.y, 80, EditorGUIUtility.singleLineHeight), "Group Name");
+                        EditorGUI.LabelField(new Rect(rect.x + 400, rect.y, 80, EditorGUIUtility.singleLineHeight), new GUIContent("Group Name", "Defines which part of the SearchRegex will be testet with the MatchRegex."));
                         
                         if (string.IsNullOrEmpty(groupNameProperty.stringValue))
                         {
@@ -283,7 +283,7 @@ namespace Morchul.CodeManager
 
                         //Last add MatchRegex
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), "Match Regex");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), new GUIContent("Match Regex", "The value of the GroupName will be tested with this Regex. If there is no match there is a code guideline violation."));
                         if (matchRegexProperty.intValue < 0)
                         {
                             Color defaultColor = GUI.backgroundColor;
@@ -515,7 +515,7 @@ namespace Morchul.CodeManager
         {
             EditorGUILayout.BeginVertical();
 
-            settings.DocumentationRegex.Regex = EditorGUILayout.TextField("Documentation Regex", settings.DocumentationRegex.Regex);
+            settings.DocumentationRegex.Regex = EditorGUILayout.TextField(new GUIContent("Documentation Regex", "This regex checks if it is a documentation for the next CodePiece"), settings.DocumentationRegex.Regex);
 
             regexList.Expanded = EditorGUILayout.Foldout(regexList.Expanded, "Regexes");
             if (regexList.Expanded)

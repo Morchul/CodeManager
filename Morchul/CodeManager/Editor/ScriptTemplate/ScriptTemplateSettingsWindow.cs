@@ -78,16 +78,16 @@ namespace Morchul.CodeManager
                     {
                         //Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Name");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Scriptfolder. Displayed when you create a new script and have to choose a folder"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 52, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Add Path
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Path");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Path", "The Path of the folder, has to end with a '/' e.g: Assets/Scripts/"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 150, EditorGUIUtility.singleLineHeight), pathProperty, GUIContent.none);
 
                         //Add Selectfolder button
-                        if (GUI.Button(new Rect(rect.x + rect.width - 90, rect.y, 90, EditorGUIUtility.singleLineHeight), new GUIContent("Select Folder")))
+                        if (GUI.Button(new Rect(rect.x + rect.width - 90, rect.y, 90, EditorGUIUtility.singleLineHeight), new GUIContent("Select Folder", "Browse for a folder in your explorer. The Folder has to be under Assets/")))
                         {
                             pathProperty.stringValue = CodeManagerEditorUtility.SelectFolderInAssets(pathProperty.stringValue);
                             Repaint();
@@ -160,12 +160,12 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Name");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "The name of the placeholder. Has to be written without % at the begin and end."));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Value
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), "Value");
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Value", "The value through which the placeholder will be replaced by script creation."));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), placeholder.FindPropertyRelative("Value"), GUIContent.none);
 
                         //Add errorbox by wrong path name

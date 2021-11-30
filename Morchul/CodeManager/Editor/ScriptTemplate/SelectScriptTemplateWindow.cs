@@ -14,8 +14,8 @@ namespace Morchul.CodeManager
         private const float MIN_WIDTH = 200;
         private const float MIN_HEIGHT = 150;
 
-        private const float SCRIPT_TEMPLATE_BOX_WIDTH = 150;
-        private const float SCRIPT_TEMPLATE_BOX_HEIGHT = 100;
+        private const float SCRIPT_TEMPLATE_BOX_WIDTH = 200;
+        private const float SCRIPT_TEMPLATE_BOX_HEIGHT = 40;
 
         private const float BORDER_WIDTH = 10;
 
@@ -25,7 +25,7 @@ namespace Morchul.CodeManager
 
         private int selectedScriptTemplateIndex;
 
-        private Texture2D scriptTemplateImage;
+        //private Texture2D scriptTemplateImage;
 
         public static void ShowWindow()
         {
@@ -64,7 +64,7 @@ namespace Morchul.CodeManager
         {
             scriptTemplates = LoadScriptTemplates();
 
-            scriptTemplateImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.ScriptTemplateImage);
+            //scriptTemplateImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.ScriptTemplateImage);
         }
 
         private GUIContent[] GetScriptTemplateGUIContents()
@@ -72,7 +72,8 @@ namespace Morchul.CodeManager
             GUIContent[] guiContents = new GUIContent[scriptTemplates.Length];
             for(int i = 0; i < guiContents.Length; ++i)
             {
-                guiContents[i] = new GUIContent(scriptTemplates[i].TemplateName, scriptTemplateImage);
+                string templateName = scriptTemplates[i].TemplateName;
+                guiContents[i] = new GUIContent(templateName, "Press to create a new script from  the " + templateName + " template.");
             }
             return guiContents;
         }
@@ -92,7 +93,7 @@ namespace Morchul.CodeManager
             }
 
             int amountOfBoxesInX = (int)((position.width - BORDER_WIDTH * 2) / SCRIPT_TEMPLATE_BOX_WIDTH);
-            amountOfBoxesInX = Mathf.Min(amountOfBoxesInX, scriptTemplates.Length);
+            amountOfBoxesInX = Mathf.Max(1, Mathf.Min(amountOfBoxesInX, scriptTemplates.Length));
 
             GUILayout.BeginArea(new Rect(BORDER_WIDTH, BORDER_WIDTH, position.width - BORDER_WIDTH * 2, position.height - BORDER_WIDTH * 2));
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
@@ -121,7 +122,7 @@ namespace Morchul.CodeManager
             GUIStyle style = new GUIStyle(GUI.skin.button);
             style.alignment = TextAnchor.MiddleCenter;
             style.imagePosition = ImagePosition.ImageAbove;
-            style.fixedWidth = SCRIPT_TEMPLATE_BOX_WIDTH;
+            style.stretchWidth = true;
             style.fixedHeight = SCRIPT_TEMPLATE_BOX_HEIGHT;
             return style;
         }

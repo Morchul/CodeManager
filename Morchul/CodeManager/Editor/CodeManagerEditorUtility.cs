@@ -13,7 +13,6 @@ namespace Morchul.CodeManager
     {
 
         #region Image Paths
-        public const string ScriptTemplateImage = CodeManagerUtility.CodeManagerResourcePath + "ScriptTemplateImage.png";
         public const string UnwantedCodeImage = CodeManagerUtility.CodeManagerResourcePath + "UnwantedCodeImage.PNG";
         public const string CodeGuidelineImage = CodeManagerUtility.CodeManagerResourcePath + "CodeGuidelineImage.png";
         public const string DocumentationImage = CodeManagerUtility.CodeManagerResourcePath + "CodeDocumentationImage.png";

@@ -19,3 +19,5 @@ MonoBehaviour:
   Placeholders:
   - Name: namespace
     Value: Morchul.CodeManager
+  - Name: ScriptNam
+    Value: 

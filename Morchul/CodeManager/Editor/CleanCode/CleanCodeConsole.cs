@@ -40,8 +40,9 @@ namespace Morchul.CodeManager
         private void OnEnable()
         {
             LoadSettings();
+            selectedScriptTemplateIndex = -1;
 
-            if(cleanCodeViolations == null)
+            if (cleanCodeViolations == null)
             {
                 cleanCodeViolations = new List<CleanCodeViolation>();
             }
@@ -110,11 +111,11 @@ namespace Morchul.CodeManager
             EditorGUILayout.BeginVertical();
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Scan"))
+            if (GUILayout.Button(new GUIContent("Scan", "Press this button to scan all ScriptFolders for CleanCode violations")))
             {
                 ScanFolders();
             }
-            if (GUILayout.Button("Clear"))
+            if (GUILayout.Button(new GUIContent("Clear", "Clear the CleanCode Console")))
             {
                 Clear();
             }

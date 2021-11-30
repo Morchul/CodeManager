@@ -81,14 +81,14 @@ namespace Morchul.CodeManager
 
             EditorGUILayout.BeginVertical();
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Script name: ", GUILayout.Width(100));
+            EditorGUILayout.LabelField(new GUIContent("Script name: ", "The name which the script will have and which will placed for the placeholder %ScriptName%"), GUILayout.Width(100));
             scriptName = EditorGUILayout.TextField(scriptName, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Select Folder: ", GUILayout.Width(100));
+            EditorGUILayout.LabelField(new GUIContent("Select Folder: ", "The folder where the new script will be created."), GUILayout.Width(100));
             
             if (EditorGUILayout.DropdownButton(new GUIContent(selectedFolderName), FocusType.Passive))
             {
