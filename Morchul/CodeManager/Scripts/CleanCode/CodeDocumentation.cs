@@ -5,7 +5,7 @@ namespace Morchul.CodeManager
     /// If the search with the Regex returns a Result the Code Part before the match will be checked with the DocumentationRegex in CleanCodeSettings if there is no match a CleanCodeViolation will be created.
     /// </summary>
     [System.Serializable]
-    public struct CodeDocumentation : IScanable
+    public struct CodeDocumentation : ICleanCodeRule
     {
         public string Name;
         public int RegexIndex;
@@ -34,9 +34,9 @@ namespace Morchul.CodeManager
             this.ID = ID;
         }
 
-        IScanable.ScanableType IScanable.GetType()
+        ICleanCodeRule.CleanCodeRuleType ICleanCodeRule.GetType()
         {
-            return IScanable.ScanableType.CodeDocumentation;
+            return ICleanCodeRule.CleanCodeRuleType.CodeDocumentation;
         }
     }
 }

@@ -11,55 +11,55 @@ namespace Morchul.CodeManager
 
         public CodeManagerRegex DocumentationRegex;
 
-        public Dictionary<int, IScanable> scanables { get; private set; }
+        public Dictionary<int, ICleanCodeRule> cleanCodeRules { get; private set; }
 
-        private int scanableIDCounter = 0;
+        private int rulesIDCounter = 0;
 
         private void OnEnable()
         {
-            if (scanables == null)
+            if (cleanCodeRules == null)
             {
-                scanables = new Dictionary<int, IScanable>();
-                UpdateScanables();
+                cleanCodeRules = new Dictionary<int, ICleanCodeRule>();
+                UpdateRules();
             }
         }
 
-        private void AddIScanable(IScanable scanable)
+        private void AddICleanCodeRule(ICleanCodeRule rules)
         {
-            if(scanable.IsValid())
-                scanables.Add(scanable.GetID(), scanable);
+            if(rules.IsValid())
+                cleanCodeRules.Add(rules.GetID(), rules);
         }
 
-        public void UpdateScanables()
+        public void UpdateRules()
         {
-            scanables.Clear();
+            cleanCodeRules.Clear();
             if (UnwantedCodes == null || CodeGuidelines == null || CodeDocumentations == null) return;
 
             for (int i = 0; i < UnwantedCodes.Length; ++i)
             {
                 if(UnwantedCodes[i].GetID() == 0)
                 {
-                    UnwantedCodes[i].SetID(++scanableIDCounter);
+                    UnwantedCodes[i].SetID(++rulesIDCounter);
                 }
-                AddIScanable(UnwantedCodes[i]);
+                AddICleanCodeRule(UnwantedCodes[i]);
             }
 
             for (int i = 0; i < CodeGuidelines.Length; ++i)
             {
                 if (CodeGuidelines[i].GetID() == 0)
                 {
-                    CodeGuidelines[i].SetID(++scanableIDCounter);
+                    CodeGuidelines[i].SetID(++rulesIDCounter);
                 }
-                AddIScanable(CodeGuidelines[i]);
+                AddICleanCodeRule(CodeGuidelines[i]);
             }
 
             for (int i = 0; i < CodeDocumentations.Length; ++i)
             {
                 if (CodeDocumentations[i].GetID() == 0)
                 {
-                    CodeDocumentations[i].SetID(++scanableIDCounter);
+                    CodeDocumentations[i].SetID(++rulesIDCounter);
                 }
-                AddIScanable(CodeDocumentations[i]);
+                AddICleanCodeRule(CodeDocumentations[i]);
             }
         }
 

@@ -95,9 +95,9 @@ namespace Morchul.CodeManager
 
                         //Add Scan selection button
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        if(GUI.Button(new Rect(rect.x, rect.y, 200, EditorGUIUtility.singleLineHeight), "Select scans for this folder"))
+                        if(GUI.Button(new Rect(rect.x, rect.y, 230, EditorGUIUtility.singleLineHeight), "Select CleanCode rules for this folder"))
                         {
-                            SelectScansWindow.ShowWindow(settings.ScriptFolders[index]);
+                            SelectCleanCodeRulesWindow.ShowWindow(settings.ScriptFolders[index]);
                         }
 
                         //Add errorbox by wrong path name

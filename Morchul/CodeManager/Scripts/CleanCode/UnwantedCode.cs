@@ -5,7 +5,7 @@ namespace Morchul.CodeManager
     /// If the search with the Regex find somthing a CleanCodeVioletion will be created for this unwanted code
     /// </summary>
     [System.Serializable]
-    public struct UnwantedCode : IScanable
+    public struct UnwantedCode : ICleanCodeRule
     {
         public string Name;
         public int RegexIndex;
@@ -34,9 +34,9 @@ namespace Morchul.CodeManager
             this.ID = ID;
         }
 
-        IScanable.ScanableType IScanable.GetType()
+        ICleanCodeRule.CleanCodeRuleType ICleanCodeRule.GetType()
         {
-            return IScanable.ScanableType.UnwantedCode;
+            return ICleanCodeRule.CleanCodeRuleType.UnwantedCode;
         }
     }
 }

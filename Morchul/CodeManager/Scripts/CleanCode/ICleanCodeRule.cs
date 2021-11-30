@@ -1,15 +1,15 @@
-public interface IScanable
+public interface ICleanCodeRule
 {
     public int GetID();
     public void SetID(int ID);
 
     public string GetName();
 
-    public ScanableType GetType();
+    public CleanCodeRuleType GetType();
 
     public bool IsValid();
 
-    public enum ScanableType
+    public enum CleanCodeRuleType
     {
         CodingGuideline,
         UnwantedCode,

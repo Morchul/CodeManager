@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
-    public class SelectScansWindow : EditorWindow
+    public class SelectCleanCodeRulesWindow : EditorWindow
     {
-        private static SelectScansWindow instance;
+        private static SelectCleanCodeRulesWindow instance;
 
         private CleanCodeSettings settings;
 
         private Vector2 scrollPos;
 
-        private const float scanableFieldWidth = 250;
+        private const float cleanCodeRuleFieldWidth = 250;
 
         private const float MIN_WIDTH = 200;
         private const float MIN_HEIGHT = 150;
@@ -23,8 +23,8 @@ namespace Morchul.CodeManager
 
         public static void ShowWindow(ScriptFolder scriptFolder)
         {
-            SelectScansWindow.scriptFolder = scriptFolder;
-            instance = CreateInstance<SelectScansWindow>();
+            SelectCleanCodeRulesWindow.scriptFolder = scriptFolder;
+            instance = CreateInstance<SelectCleanCodeRulesWindow>();
             instance.minSize = new Vector2(MIN_WIDTH, MIN_HEIGHT);
             instance.titleContent = new GUIContent("Script template settings");
             instance.Show();
@@ -34,23 +34,23 @@ namespace Morchul.CodeManager
         {
             LoadSettings();
 
-            RemoveNotExistingScanables();
+            RemoveNotExistingCleanCodeRules();
         }
 
-        private void RemoveNotExistingScanables()
+        private void RemoveNotExistingCleanCodeRules()
         {
-            if (settings == null || scriptFolder == null || scriptFolder.ScanFor == null) return;
-            if (settings.scanables.Count == 0) 
+            if (settings == null || scriptFolder == null || scriptFolder.CleanCodeRules == null) return;
+            if (settings.cleanCodeRules.Count == 0) 
             {
-                scriptFolder.ScanFor.Clear();
+                scriptFolder.CleanCodeRules.Clear();
                 return;
             }
 
-            for (int i = 0; i < scriptFolder.ScanFor.Count; ++i)
+            for (int i = 0; i < scriptFolder.CleanCodeRules.Count; ++i)
             {
-                if (!settings.scanables.Keys.Contains(scriptFolder.ScanFor[i]))
+                if (!settings.cleanCodeRules.Keys.Contains(scriptFolder.CleanCodeRules[i]))
                 {
-                    scriptFolder.ScanFor.RemoveAt(i);
+                    scriptFolder.CleanCodeRules.RemoveAt(i);
                 }
             }
         }
@@ -68,9 +68,9 @@ namespace Morchul.CodeManager
 
         private void OnGUI()
         {
-            if (settings == null || settings.scanables.Count == 0)
+            if (settings == null || settings.cleanCodeRules.Count == 0)
             {
-                EditorGUILayout.HelpBox("There are no Scanables created yet. You can create some in the Clean Code settings.", MessageType.Warning);
+                EditorGUILayout.HelpBox("There are no CleanCode rules created yet. You can create some in the Clean Code settings.", MessageType.Warning);
                 return;
             }
 
@@ -79,13 +79,13 @@ namespace Morchul.CodeManager
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             EditorGUILayout.BeginVertical();
 
-            int amountOfBoxesInX = (int)((position.width - BORDER_WIDTH * 2) / scanableFieldWidth);
-            amountOfBoxesInX = Mathf.Max(1, Mathf.Min(amountOfBoxesInX, settings.scanables.Count));
+            int amountOfBoxesInX = (int)((position.width - BORDER_WIDTH * 2) / cleanCodeRuleFieldWidth);
+            amountOfBoxesInX = Mathf.Max(1, Mathf.Min(amountOfBoxesInX, settings.cleanCodeRules.Count));
 
             int boxesInXCounter = 0;
 
-            int amountOfBoxesInY = settings.scanables.Count / amountOfBoxesInX + 1;
-            IScanable.ScanableType currentType = IScanable.ScanableType.None;
+            int amountOfBoxesInY = settings.cleanCodeRules.Count / amountOfBoxesInX + 1;
+            ICleanCodeRule.CleanCodeRuleType currentType = ICleanCodeRule.CleanCodeRuleType.None;
             for(int y = 0; y < amountOfBoxesInY; ++y)
             {
                 for(int x = 0; x < amountOfBoxesInX; ++x)
@@ -94,34 +94,34 @@ namespace Morchul.CodeManager
                         EditorGUILayout.BeginHorizontal();
 
                     int index = x + y * amountOfBoxesInX;
-                    if (index < settings.scanables.Count)
+                    if (index < settings.cleanCodeRules.Count)
                     {
-                        IScanable scanable = settings.scanables.ElementAt(index).Value;
-                        if(currentType != scanable.GetType())
+                        ICleanCodeRule rules = settings.cleanCodeRules.ElementAt(index).Value;
+                        if(currentType != rules.GetType())
                         {
                             EditorGUILayout.EndHorizontal();
                             //New Type
                             boxesInXCounter = 0;
-                            currentType = scanable.GetType();
+                            currentType = rules.GetType();
                             EditorGUILayout.LabelField(currentType.ToString());
                             EditorGUILayout.BeginHorizontal();
                         }
 
-                        #region ScanableBox
-                        EditorGUILayout.BeginHorizontal("box", GUILayout.MaxWidth(scanableFieldWidth));
-                        EditorGUILayout.LabelField(scanable.GetName(), GUILayout.MaxWidth(scanableFieldWidth - 30));
-                        bool selected = scriptFolder.ScanFor.Contains(scanable.GetID());
+                        #region CleanCodeRuleBox
+                        EditorGUILayout.BeginHorizontal("box", GUILayout.MaxWidth(cleanCodeRuleFieldWidth));
+                        EditorGUILayout.LabelField(rules.GetName(), GUILayout.MaxWidth(cleanCodeRuleFieldWidth - 30));
+                        bool selected = scriptFolder.CleanCodeRules.Contains(rules.GetID());
                         if (EditorGUILayout.Toggle(selected))
                         {
                             if (!selected)
                             {
-                                scriptFolder.ScanFor.Add(scanable.GetID());
+                                scriptFolder.CleanCodeRules.Add(rules.GetID());
                                 EditorUtility.SetDirty(settings);
                             }
                         }
                         else if(selected)
                         {
-                            scriptFolder.ScanFor.Remove(scanable.GetID());
+                            scriptFolder.CleanCodeRules.Remove(rules.GetID());
                             EditorUtility.SetDirty(settings);
                         }
                         EditorGUILayout.EndHorizontal();

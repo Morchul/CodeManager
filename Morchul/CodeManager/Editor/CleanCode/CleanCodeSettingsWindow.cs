@@ -50,7 +50,7 @@ namespace Morchul.CodeManager
 
         private void OnDisable()
         {
-            settings.UpdateScanables();
+            settings.UpdateRules();
         }
 
         private void LoadSettings()
@@ -61,7 +61,7 @@ namespace Morchul.CodeManager
                 settings = ScriptableObject.CreateInstance<CleanCodeSettings>();
                 DefaultSettings.SetDefaultCleanCodeSettings(settings);
                 AssetDatabase.CreateAsset(settings, CodeManagerUtility.CleanCodeSettingsObject);
-                settings.UpdateScanables();
+                settings.UpdateRules();
             }
 
             serializedSettings = new SerializedObject(settings);
@@ -105,7 +105,7 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Unwanted Code and will be shown in the scanables in the ScriptFolders"));
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Unwanted Code and will be shown in the CleanCode rules in the ScriptFolders"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Description
@@ -172,7 +172,7 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Code Documentation and will be shown in the scanables in the ScriptFolders"));
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Code Documentation and will be shown in the CleanCode rules in the ScriptFolders"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Description
@@ -243,7 +243,7 @@ namespace Morchul.CodeManager
                     {
                         //First Add name
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Code Guideline and will be shown in the scanables in the ScriptFolders"));
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Code Guideline and will be shown in the CleanCode rules in the ScriptFolders"));
                         EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
 
                         //Second add Description
@@ -478,9 +478,9 @@ namespace Morchul.CodeManager
 
             EditorGUILayout.BeginVertical();
 
-            if (GUILayout.Button(new GUIContent("Update Scanables", "Creating scanables is a resource heavy task. To limit the amount of creations, the Scanables will only be updated by closing this window or pressing this button.")))
+            if (GUILayout.Button(new GUIContent("Update CleanCode Rules", "Creating CleanCode rules is a resource heavy task. To limit the amount of creations, the CleanCode rules will only be updated by closing this window or pressing this button.")))
             {
-                settings.UpdateScanables();
+                settings.UpdateRules();
             }
 
             serializedSettings.Update();

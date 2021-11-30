@@ -29,7 +29,7 @@ namespace Morchul.CodeManager
             this.scriptFolder = scriptFolder;
             searchedRegexes.Clear();
 
-            if (scriptFolder.ScanFor.Count == 0 || cleanCodeSettings.scanables == null) return null; //Do not scan this folder
+            if (scriptFolder.CleanCodeRules.Count == 0 || cleanCodeSettings.cleanCodeRules == null) return null; //Do not scan this folder
 
             List<CleanCodeViolation> ccvs = new List<CleanCodeViolation>();
             string[] scriptNames = GetAllSriptNames();
@@ -50,26 +50,26 @@ namespace Morchul.CodeManager
 
                 CleanCodeViolation[] ccv;
 
-                //Scan for every scanable
-                foreach (int scanableID in scriptFolder.ScanFor)
+                //Scan for every CleanCode rule
+                foreach (int ruleID in scriptFolder.CleanCodeRules)
                 {
-                    if(cleanCodeSettings.scanables.TryGetValue(scanableID, out IScanable scanable))
+                    if(cleanCodeSettings.cleanCodeRules.TryGetValue(ruleID, out ICleanCodeRule rule))
                     {
                         
-                        switch (scanable.GetType())
+                        switch (rule.GetType())
                         {
-                            case IScanable.ScanableType.CodeDocumentation:
-                                ccv = ScanCodeDocumentation((CodeDocumentation)scanable, scriptInspection, scriptObj);
+                            case ICleanCodeRule.CleanCodeRuleType.CodeDocumentation:
+                                ccv = ScanCodeDocumentation((CodeDocumentation)rule, scriptInspection, scriptObj);
                                 if (ccv != null)
                                     ccvs.AddRange(ccv);
                                 break;
-                            case IScanable.ScanableType.UnwantedCode:
-                                ccv = ScanUnwantedCode((UnwantedCode)scanable, scriptInspection, scriptObj);
+                            case ICleanCodeRule.CleanCodeRuleType.UnwantedCode:
+                                ccv = ScanUnwantedCode((UnwantedCode)rule, scriptInspection, scriptObj);
                                 if (ccv != null)
                                     ccvs.AddRange(ccv);
                                 break;
-                            case IScanable.ScanableType.CodingGuideline:
-                                ccv = ScanCodeGuideline((CodeGuideline)scanable, scriptInspection, scriptObj);
+                            case ICleanCodeRule.CleanCodeRuleType.CodingGuideline:
+                                ccv = ScanCodeGuideline((CodeGuideline)rule, scriptInspection, scriptObj);
                                 if (ccv != null)
                                     ccvs.AddRange(ccv);
                                 break;

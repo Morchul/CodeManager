@@ -6,7 +6,7 @@ namespace Morchul.CodeManager
     /// If something is found, the found group with GroupName will be matched with MatchRegex if this is false a CleanCodeViolation will be created
     /// </summary>
     [System.Serializable]
-    public struct CodeGuideline : IScanable
+    public struct CodeGuideline : ICleanCodeRule
     {
         public string Name;
         public int SearchRegexIndex;
@@ -39,9 +39,9 @@ namespace Morchul.CodeManager
             this.ID = ID;
         }
 
-        IScanable.ScanableType IScanable.GetType()
+        ICleanCodeRule.CleanCodeRuleType ICleanCodeRule.GetType()
         {
-            return IScanable.ScanableType.CodingGuideline;
+            return ICleanCodeRule.CleanCodeRuleType.CodingGuideline;
         }
     }
 }
