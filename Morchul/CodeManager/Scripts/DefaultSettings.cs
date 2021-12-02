@@ -19,7 +19,7 @@ namespace Morchul.CodeManager
         public const string ClassRegex = @".*class.*" + IdentifierRegex;
 
 
-        public readonly static string DefaultDocumentationRegex = @"[^\S][\/]{2,3}.*\n?$";
+        public const string DefaultDocumentationRegex = @"[^\S][\/]{2,3}.*\n?$";
         #endregion
 
         public static void SetDefaultCleanCodeSettings(CleanCodeSettings cleanCodeSettings)
@@ -41,14 +41,13 @@ namespace Morchul.CodeManager
             cleanCodeSettings.DocumentationRegex = new CodeManagerRegex() { Regex = DefaultDocumentationRegex };
 
             //Set default unwanted Codes
-            cleanCodeSettings.UnwantedCodes[0] = new UnwantedCode { Name = "Empty Codeblock", Description = "No empty code blocks allowed.", ID = 0, RegexIndex = 0 };
+            cleanCodeSettings.UnwantedCodes[0] = new UnwantedCode { Name = "Empty Codeblock", Description = "No empty code blocks allowed.", RegexIndex = 0 };
 
             //Set default code guidelines
             cleanCodeSettings.CodeGuidelines[0] = new CodeGuideline
             {
                 Name = "Method Name",
                 Description = "Methods have to start with a capital letter",
-                ID = 0,
                 GroupName = "identifier",
                 SearchRegexIndex = 1,
                 MatchRegexIndex = 5
@@ -58,14 +57,13 @@ namespace Morchul.CodeManager
             {
                 Name = "Private field name",
                 Description = "private fields have to start with a lowercase letter",
-                ID = 0,
                 GroupName = "identifier",
                 SearchRegexIndex = 4,
                 MatchRegexIndex = 6
             };
 
             //Set default code documentations
-            cleanCodeSettings.CodeDocumentations[0] = new CodeDocumentation { Name = "Documentation on class", Description = "Classes must be documented", ID = 0, RegexIndex = 2 };
+            cleanCodeSettings.CodeDocumentations[0] = new CodeDocumentation { Name = "Documentation on class", Description = "Classes must be documented", RegexIndex = 2 };
         }
     }
 }

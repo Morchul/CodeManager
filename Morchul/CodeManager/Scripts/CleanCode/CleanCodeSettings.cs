@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// The settings for CleanCode where you can define all CleanCodeRules and Regexes
+    /// The settings are saved as ScriptableObject under CodeManager/Resources/CleanCodeSettings
+    /// </summary>
     public class CleanCodeSettings : ScriptableObject
     {
         public UnwantedCode[] UnwantedCodes;
@@ -11,28 +15,49 @@ namespace Morchul.CodeManager
 
         public CodeManagerRegex DocumentationRegex;
 
-        public Dictionary<int, ICleanCodeRule> cleanCodeRules { get; private set; }
+        public CodeManagerRegex[] Regexes;
 
-        private int rulesIDCounter = 0;
+        public Dictionary<uint, ICleanCodeRule> CleanCodeRules { get; private set; }
+
+        private uint rulesIDCounter = 0;
+
+        private event System.Action CleanCodeSettingsReady;
 
         private void OnEnable()
         {
-            if (cleanCodeRules == null)
+            if (CleanCodeRules == null)
             {
-                cleanCodeRules = new Dictionary<int, ICleanCodeRule>();
+                CleanCodeRules = new Dictionary<uint, ICleanCodeRule>();
                 UpdateRules();
+                CleanCodeSettingsReady?.Invoke();
+                CleanCodeSettingsReady = null;
+            }
+        }
+
+        public void AddReadyListener(System.Action onReadyAction)
+        {
+            if (CleanCodeRules == null)
+            {
+                CleanCodeSettingsReady += onReadyAction;
+            }
+            else
+            {
+                onReadyAction?.Invoke();
             }
         }
 
         private void AddICleanCodeRule(ICleanCodeRule rules)
         {
             if(rules.IsValid())
-                cleanCodeRules.Add(rules.GetID(), rules);
+                CleanCodeRules.Add(rules.GetID(), rules);
         }
 
+        /// <summary>
+        /// Update the CleanCodeRules Dictionary (UnwantedCode, CodeGuideline, CodeDocumentation)
+        /// </summary>
         public void UpdateRules()
         {
-            cleanCodeRules.Clear();
+            CleanCodeRules.Clear();
             if (UnwantedCodes == null || CodeGuidelines == null || CodeDocumentations == null) return;
 
             for (int i = 0; i < UnwantedCodes.Length; ++i)
@@ -62,7 +87,5 @@ namespace Morchul.CodeManager
                 AddICleanCodeRule(CodeDocumentations[i]);
             }
         }
-
-        public CodeManagerRegex[] Regexes;
     }
 }

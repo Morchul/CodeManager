@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -13,9 +12,9 @@ namespace Morchul.CodeManager
     {
 
         #region Image Paths
-        public const string UnwantedCodeImage = CodeManagerUtility.CodeManagerResourcePath + "UnwantedCodeImage.PNG";
-        public const string CodeGuidelineImage = CodeManagerUtility.CodeManagerResourcePath + "CodeGuidelineImage.png";
-        public const string DocumentationImage = CodeManagerUtility.CodeManagerResourcePath + "CodeDocumentationImage.png";
+        public const string UnwantedCodeImagePath = CodeManagerUtility.CodeManagerResourcePath + "UnwantedCodeImage.PNG";
+        public const string CodeGuidelineImagePath = CodeManagerUtility.CodeManagerResourcePath + "CodeGuidelineImage.png";
+        public const string DocumentationImagePath = CodeManagerUtility.CodeManagerResourcePath + "CodeDocumentationImage.png";
         #endregion
 
         /// <summary>

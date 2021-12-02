@@ -16,25 +16,21 @@ MonoBehaviour:
   - Name: Empty Codeblock
     RegexIndex: 0
     Description: No empty code blocks allowed.
-    ID: 1
   CodeGuidelines:
   - Name: Method Name
     SearchRegexIndex: 1
     GroupName: identifier
     MatchRegexIndex: 5
     Description: Methods have to start with a capital letter
-    ID: 2
   - Name: Private field name
     SearchRegexIndex: 4
     GroupName: identifier
     MatchRegexIndex: 6
     Description: private fields have to start with a lowercase letter
-    ID: 3
   CodeDocumentations:
   - Name: Documentation on class
     RegexIndex: 2
     Description: Classes must be documented
-    ID: 4
   DocumentationRegex:
     Name: 
     Regex: '[^\S][\/]{2,3}.*\n?$'

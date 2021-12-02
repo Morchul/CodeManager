@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace Morchul.CodeManager
 {
@@ -30,6 +29,7 @@ namespace Morchul.CodeManager
 
         /// <summary>
         /// How many lines the CodePiece contains
+        /// Will only be calculated when calcLineCount is true
         /// </summary>
         private int lineCount;
         public int LineCount => lineCount;
@@ -57,6 +57,9 @@ namespace Morchul.CodeManager
             CalcLineCount();
         }
 
+        /// <summary>
+        /// Calculates the line count of CodePiece if calcLineCount is true
+        /// </summary>
         private void CalcLineCount()
         {
             if(calcLineCount)

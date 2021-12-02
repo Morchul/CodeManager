@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -7,6 +6,10 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// The FolderScanner is used to scan all scripts in a ScriptFolder for, in this folder defined, CleanCodeRules
+    /// Then the FolderScanner will create and return every CleanCodeViolation found.
+    /// </summary>
     public class FolderScanner
     {
         private ScriptFolder scriptFolder;
@@ -24,21 +27,26 @@ namespace Morchul.CodeManager
             searchedRegexes = new Dictionary<int, LinkedListNode<CodePiece>[]>();
         }
 
+        /// <summary>
+        /// Scans every script in the Scriptfolder for every defined CleanCodeRule of this folder
+        /// This will not scan scripts in sub-folders.
+        /// </summary>
+        /// <param name="scriptFolder">The Scriptfolder which should be scanned</param>
+        /// <returns>All found CleanCodeViolations</returns>
         public CleanCodeViolation[] ScanFolder(ScriptFolder scriptFolder)
         {
             this.scriptFolder = scriptFolder;
             searchedRegexes.Clear();
-
-            if (scriptFolder.CleanCodeRules.Count == 0 || cleanCodeSettings.cleanCodeRules == null) return null; //Do not scan this folder
+            if (scriptFolder.CleanCodeRules.Count == 0 || cleanCodeSettings.CleanCodeRules == null) return null; //Do not scan this folder
 
             List<CleanCodeViolation> ccvs = new List<CleanCodeViolation>();
             string[] scriptNames = GetAllSriptNames();
-
+            CodeInspection scriptInspection;
             //For every script
-            for(int i = 0; i < scriptNames.Length; ++i)
+            for (int i = 0; i < scriptNames.Length; ++i)
             {
                 //Start CodeInspection
-                CodeInspection scriptInspection = CodeInspector.InspectFile(scriptNames[i], InspectionMode.READ);
+                scriptInspection = CodeInspector.InspectFile(scriptNames[i], InspectionMode.READ);
                 scriptInspection.Settings = new CodeInspectionSettings()
                 {
                     AddLineIndex = true,
@@ -51,9 +59,9 @@ namespace Morchul.CodeManager
                 CleanCodeViolation[] ccv;
 
                 //Scan for every CleanCode rule
-                foreach (int ruleID in scriptFolder.CleanCodeRules)
+                foreach (uint ruleID in scriptFolder.CleanCodeRules)
                 {
-                    if(cleanCodeSettings.cleanCodeRules.TryGetValue(ruleID, out ICleanCodeRule rule))
+                    if(cleanCodeSettings.CleanCodeRules.TryGetValue(ruleID, out ICleanCodeRule rule))
                     {
                         
                         switch (rule.GetType())
@@ -76,11 +84,21 @@ namespace Morchul.CodeManager
                         }
                     }
                 }
+
+                CodeInspector.StopFileInspection(scriptInspection);
+                searchedRegexes.Clear();
             }
 
             return ccvs.ToArray();
         }
 
+        /// <summary>
+        /// Scans for unwanted code
+        /// </summary>
+        /// <param name="unwantedCode">The unwanted code rule</param>
+        /// <param name="scriptInspection">The script inspection for the file</param>
+        /// <param name="script">The script object which is inspected</param>
+        /// <returns>All found CleanCodeViolations occured by violating the unwanted code rule</returns>
         private CleanCodeViolation[] ScanUnwantedCode(UnwantedCode unwantedCode, CodeInspection scriptInspection, Object script)
         {
             if(FindAll(unwantedCode.RegexIndex, scriptInspection, out LinkedListNode<CodePiece>[] codePieces))
@@ -98,6 +116,13 @@ namespace Morchul.CodeManager
             return null;
         }
 
+        /// <summary>
+        /// Scans all Code documentation rules
+        /// </summary>
+        /// <param name="codeDocumentation">The code documentation rule</param>
+        /// <param name="scriptInspection">The script inspection for the file</param>
+        /// <param name="script">The script object which is inspected</param>
+        /// <returns>All found CleanCodeViolations occured by violating the code documentation rule</returns>
         private CleanCodeViolation[] ScanCodeDocumentation(CodeDocumentation codeDocumentation, CodeInspection scriptInspection, Object script)
         {
             if (FindAll(codeDocumentation.RegexIndex, scriptInspection, out LinkedListNode<CodePiece>[] codePieces))
@@ -120,6 +145,13 @@ namespace Morchul.CodeManager
             return null;
         }
 
+        /// <summary>
+        /// Scans all Code guideline rules
+        /// </summary>
+        /// <param name="codeGuideline">The code guideline rule</param>
+        /// <param name="scriptInspection">The script inspection for the file</param>
+        /// <param name="script">The script object which is inspected</param>
+        /// <returns>All found CleanCodeViolations occured by violating the code guideline rule</returns>
         private CleanCodeViolation[] ScanCodeGuideline(CodeGuideline codeGuideline, CodeInspection scriptInspection, Object script)
         {
             if (FindAll(codeGuideline.SearchRegexIndex, scriptInspection, out LinkedListNode<CodePiece>[] codePieces))
@@ -144,7 +176,13 @@ namespace Morchul.CodeManager
             return null;
         }
 
-        //A FindAll wrapper to save already searched Regexes so you don't need to search the same regex twice
+        /// <summary>
+        /// A FindAll wrapper to save already searched Regexes so you don't need to search the same regex twice
+        /// </summary>
+        /// <param name="regexIndex">Index of the regex in CleanCodeSettings.Regexes[]</param>
+        /// <param name="scriptInspection">The script inspection for the file</param>
+        /// <param name="searchResult">out all found results of the Regexes will be assingned to this array</param>
+        /// <returns>True if something was found</returns>
         private bool FindAll(int regexIndex, CodeInspection scriptInspection, out LinkedListNode<CodePiece>[] searchResult)
         {
             if (searchedRegexes.TryGetValue(regexIndex, out searchResult))
@@ -161,29 +199,45 @@ namespace Morchul.CodeManager
             return false;
         }
 
+        /// <summary>
+        /// Returns all script name in this folder (No Sub-Directories)
+        /// </summary>
+        /// <returns>All script names with extension</returns>
         private string[] GetAllSriptNames()
         {
             return Directory.GetFiles(CodeManagerUtility.ConvertToOpertingSystemPath(scriptFolder.Path), "*.cs", SearchOption.TopDirectoryOnly);
         }
 
+        /// <summary>
+        /// Returns the Image for UnwantedCode rule violation
+        /// </summary>
+        /// <returns>UnwantedCode rule violation image</returns>
         private Texture2D GetUnwantedCodeImage()
         {
             if(unwantedCodeImage == null)
-                unwantedCodeImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.UnwantedCodeImage);
+                unwantedCodeImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.UnwantedCodeImagePath);
             return unwantedCodeImage;
         }
 
+        /// <summary>
+        /// Returns the Image for CodeDocumentation rule violation
+        /// </summary>
+        /// <returns>CodeDocumentation rule violation image</returns>
         private Texture2D GetCodeDocumentationImage()
         {
             if (documentationImage == null)
-                documentationImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.DocumentationImage);
+                documentationImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.DocumentationImagePath);
             return documentationImage;
         }
 
+        /// <summary>
+        /// Returns the Image for CodeGuideline rule violation
+        /// </summary>
+        /// <returns>CodeGuideline rule violation image</returns>
         private Texture2D GetCodeGuidelineImage()
         {
             if (codeGuidelineImage == null)
-                codeGuidelineImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.CodeGuidelineImage);
+                codeGuidelineImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.CodeGuidelineImagePath);
             return codeGuidelineImage;
         }
     }

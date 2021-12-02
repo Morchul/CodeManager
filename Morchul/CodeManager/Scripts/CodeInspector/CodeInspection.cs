@@ -510,7 +510,9 @@ namespace Morchul.CodeManager
             }
 
             if (currentStartIndex < CompleteCode.Length)
+            {
                 codePiecesList.AddLast(CreateCodePiece(CompleteCode.Substring(currentStartIndex))); //Add the rest of the code after every match
+            }
 
             return codePieces;
         }
@@ -539,16 +541,16 @@ namespace Morchul.CodeManager
         /// </summary>
         internal bool GrantWritePermission()
         {
-            if (editationActive)
-            {
-                Debug.LogError("The CodeInspection has active CodePieces please call Commit() or Cancel() before granting write permissions");
-                return false;
-            }
-            else
+            if (IsNoEditationActive())
             {
                 Mode = InspectionMode.READ_WRITE;
                 ResetCodeInspection();
                 return true;
+            }
+            else
+            {
+                Debug.LogError("The CodeInspection has active CodePieces please call Commit() or Cancel() before granting write permissions");
+                return false;
             }
         }
         #endregion

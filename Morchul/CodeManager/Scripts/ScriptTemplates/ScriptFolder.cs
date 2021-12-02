@@ -10,12 +10,7 @@ namespace Morchul.CodeManager
     {
         public string Name;
         public string Path;
-        public List<int> CleanCodeRules;
-
-        public bool IsNull()
-        {
-            return string.IsNullOrEmpty(Path);
-        }
+        public List<uint> CleanCodeRules;
     }
 }
 

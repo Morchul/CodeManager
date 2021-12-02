@@ -121,7 +121,7 @@ namespace Morchul.CodeManager
 
         private void CreateNewScript()
         {
-            if(selectedScriptFolder.IsNull())
+            if(string.IsNullOrEmpty(selectedScriptFolder.Path))
             {
                 informationText = "No Folder selected!";
                 Debug.LogWarning(informationText);

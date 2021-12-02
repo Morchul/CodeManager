@@ -1,4 +1,5 @@
-using System.Collections;
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -54,10 +55,9 @@ namespace Morchul.CodeManager
 
             if(cleanCodeSettings != null && folderScanner != null)
             {
-                ScanFolders();
+                cleanCodeSettings.AddReadyListener(ScanFolders);
             }
         }
-
 
         private void LoadSettings()
         {
@@ -165,3 +165,5 @@ namespace Morchul.CodeManager
         }
     }
 }
+
+#endif

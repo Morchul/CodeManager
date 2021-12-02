@@ -12,14 +12,14 @@ namespace Morchul.CodeManager
 
         public string Description;
 
-        public int ID;
+        public uint ID;
 
         public bool IsValid()
         {
             return RegexIndex >= 0;
         }
 
-        public int GetID()
+        public uint GetID()
         {
             return ID;
         }
@@ -29,7 +29,7 @@ namespace Morchul.CodeManager
             return Name;
         }
 
-        public void SetID(int ID)
+        public void SetID(uint ID)
         {
             this.ID = ID;
         }

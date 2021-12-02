@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEngine;
 
@@ -20,7 +22,7 @@ namespace Morchul.CodeManager
 
         private Vector2 scrollPos;
 
-        private readonly string[] tabNames = new string[] { "Clean Code Settings", "Regexes" };
+        private readonly string[] tabNames = new string[] { "Clean Code Rules", "Regexes" };
         private int selectedTab;
 
         private string[] regexNames;
@@ -531,3 +533,5 @@ namespace Morchul.CodeManager
         #endregion
     }
 }
+
+#endif

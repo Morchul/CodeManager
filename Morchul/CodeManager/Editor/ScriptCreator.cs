@@ -5,9 +5,13 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// ScriptCreator is an utility class to assist in the creation of script templates and scripts from these templates.
+    /// The replacement of placeholder will also be done within the ScriptCreator
+    /// </summary>
     public static class ScriptCreator
     {
-        private static string[] defaultPlaceholders = new string[] { "ScriptName" };
+        private readonly static string[] defaultPlaceholders = new string[] { "ScriptName" };
 
         /// <summary>
         /// Tests if the placeholderName is in the defaultPlaceholders
@@ -60,53 +64,6 @@ namespace Morchul.CodeManager
                 }
                 return true;
             }
-        }
-
-        /// <summary>
-        /// Load the Placeholder values from the ScriptTemplateSettings and defaultPlaceholders
-        /// Placeholders from ScripTemplateSettings which are the same as defaultPlaceholders will not be added.
-        /// </summary>
-        /// <param name="placeholders">all placeholders found in the ScriptTemplateSettings and defaultPlaceholders</param>
-        /// <returns>true if settings could be loaded</returns>
-        private static bool LoadPlaceholderValues(out Placeholder[] placeholders, params string[] defaultValues)
-        {
-            ScriptTemplateSettings settings = AssetDatabase.LoadAssetAtPath<ScriptTemplateSettings>(CodeManagerUtility.ScriptTemplateSettingsObject);
-            if (settings == null)
-            {
-                Debug.LogError("There are no settings created yet for Script Templates. Please open Window: Code Manager -> Script Templates -> Settings once to auto create settings.");
-                placeholders = new Placeholder[0];
-                return false;
-            }
-
-            placeholders = new Placeholder[settings.Placeholders.Length + defaultPlaceholders.Length];
-            for (int i = 0; i < settings.Placeholders.Length; ++i)
-            {
-                if (!IsDefaultPlaceholderName(settings.Placeholders[i].Name))
-                    placeholders[i] = settings.Placeholders[i];
-            }
-
-            for (int i = 0; i < defaultValues.Length; ++i)
-            {
-                placeholders[i + settings.Placeholders.Length] = new Placeholder() { Value = defaultValues[i], Name = defaultPlaceholders[i] };
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Find the value of a placeholder name
-        /// </summary>
-        /// <param name="placeHolderName">The name of the placeholder</param>
-        /// <param name="placeholders">Placeholder array in which the placeholder will be searched.</param>
-        /// <returns>The placeholder value if found else null</returns>
-        private static string FindPlaceholderValue(string placeHolderName, Placeholder[] placeholders)
-        {
-            foreach (Placeholder ph in placeholders)
-            {
-                if (ph.Name == placeHolderName)
-                    return ph.Value;
-            }
-            return null;
         }
 
         /// <summary>
@@ -163,6 +120,53 @@ namespace Morchul.CodeManager
 
                 Debug.Log("Script: " + path + " created");
             }
+        }
+
+        /// <summary>
+        /// Load the Placeholder values from the ScriptTemplateSettings and defaultPlaceholders
+        /// Placeholders from ScripTemplateSettings which are the same as defaultPlaceholders will not be added.
+        /// </summary>
+        /// <param name="placeholders">all placeholders found in the ScriptTemplateSettings and defaultPlaceholders</param>
+        /// <returns>true if settings could be loaded</returns>
+        private static bool LoadPlaceholderValues(out Placeholder[] placeholders, params string[] defaultValues)
+        {
+            ScriptTemplateSettings settings = AssetDatabase.LoadAssetAtPath<ScriptTemplateSettings>(CodeManagerUtility.ScriptTemplateSettingsObject);
+            if (settings == null)
+            {
+                Debug.LogError("There are no settings created yet for Script Templates. Please open Window: Code Manager -> Script Templates -> Settings once to auto create settings.");
+                placeholders = new Placeholder[0];
+                return false;
+            }
+
+            placeholders = new Placeholder[settings.Placeholders.Length + defaultPlaceholders.Length];
+            for (int i = 0; i < settings.Placeholders.Length; ++i)
+            {
+                if (!IsDefaultPlaceholderName(settings.Placeholders[i].Name))
+                    placeholders[i] = settings.Placeholders[i];
+            }
+
+            for (int i = 0; i < defaultValues.Length; ++i)
+            {
+                placeholders[i + settings.Placeholders.Length] = new Placeholder() { Value = defaultValues[i], Name = defaultPlaceholders[i] };
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Find the value of a placeholder name
+        /// </summary>
+        /// <param name="placeHolderName">The name of the placeholder</param>
+        /// <param name="placeholders">Placeholder array in which the placeholder will be searched.</param>
+        /// <returns>The placeholder value if found else null</returns>
+        private static string FindPlaceholderValue(string placeHolderName, Placeholder[] placeholders)
+        {
+            foreach (Placeholder ph in placeholders)
+            {
+                if (ph.Name == placeHolderName)
+                    return ph.Value;
+            }
+            return null;
         }
     }
 }

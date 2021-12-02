@@ -5,6 +5,7 @@ using UnityEditor;
 
 namespace Morchul.CodeManager
 {
+    //All MenuItems under CodeManager
     public class MenuItems
     {
         [MenuItem("Code Manager/Clean Code/Console %m")]

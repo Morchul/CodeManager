@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -26,7 +28,7 @@ namespace Morchul.CodeManager
             SelectCleanCodeRulesWindow.scriptFolder = scriptFolder;
             instance = CreateInstance<SelectCleanCodeRulesWindow>();
             instance.minSize = new Vector2(MIN_WIDTH, MIN_HEIGHT);
-            instance.titleContent = new GUIContent("Script template settings");
+            instance.titleContent = new GUIContent("Clean Code Rules");
             instance.Show();
         }
 
@@ -40,7 +42,7 @@ namespace Morchul.CodeManager
         private void RemoveNotExistingCleanCodeRules()
         {
             if (settings == null || scriptFolder == null || scriptFolder.CleanCodeRules == null) return;
-            if (settings.cleanCodeRules.Count == 0) 
+            if (settings.CleanCodeRules.Count == 0) 
             {
                 scriptFolder.CleanCodeRules.Clear();
                 return;
@@ -48,7 +50,7 @@ namespace Morchul.CodeManager
 
             for (int i = 0; i < scriptFolder.CleanCodeRules.Count; ++i)
             {
-                if (!settings.cleanCodeRules.Keys.Contains(scriptFolder.CleanCodeRules[i]))
+                if (!settings.CleanCodeRules.Keys.Contains(scriptFolder.CleanCodeRules[i]))
                 {
                     scriptFolder.CleanCodeRules.RemoveAt(i);
                 }
@@ -68,7 +70,7 @@ namespace Morchul.CodeManager
 
         private void OnGUI()
         {
-            if (settings == null || settings.cleanCodeRules.Count == 0)
+            if (settings == null || settings.CleanCodeRules.Count == 0)
             {
                 EditorGUILayout.HelpBox("There are no CleanCode rules created yet. You can create some in the Clean Code settings.", MessageType.Warning);
                 return;
@@ -80,11 +82,11 @@ namespace Morchul.CodeManager
             EditorGUILayout.BeginVertical();
 
             int amountOfBoxesInX = (int)((position.width - BORDER_WIDTH * 2) / cleanCodeRuleFieldWidth);
-            amountOfBoxesInX = Mathf.Max(1, Mathf.Min(amountOfBoxesInX, settings.cleanCodeRules.Count));
+            amountOfBoxesInX = Mathf.Max(1, Mathf.Min(amountOfBoxesInX, settings.CleanCodeRules.Count));
 
             int boxesInXCounter = 0;
 
-            int amountOfBoxesInY = settings.cleanCodeRules.Count / amountOfBoxesInX + 1;
+            int amountOfBoxesInY = settings.CleanCodeRules.Count / amountOfBoxesInX + 1;
             ICleanCodeRule.CleanCodeRuleType currentType = ICleanCodeRule.CleanCodeRuleType.None;
             for(int y = 0; y < amountOfBoxesInY; ++y)
             {
@@ -94,9 +96,9 @@ namespace Morchul.CodeManager
                         EditorGUILayout.BeginHorizontal();
 
                     int index = x + y * amountOfBoxesInX;
-                    if (index < settings.cleanCodeRules.Count)
+                    if (index < settings.CleanCodeRules.Count)
                     {
-                        ICleanCodeRule rules = settings.cleanCodeRules.ElementAt(index).Value;
+                        ICleanCodeRule rules = settings.CleanCodeRules.ElementAt(index).Value;
                         if(currentType != rules.GetType())
                         {
                             EditorGUILayout.EndHorizontal();
@@ -145,3 +147,4 @@ namespace Morchul.CodeManager
         #endregion
     }
 }
+#endif

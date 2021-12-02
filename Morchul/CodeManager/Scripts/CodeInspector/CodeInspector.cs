@@ -10,7 +10,7 @@ namespace Morchul.CodeManager
     public static class CodeInspector
     {
         private static readonly List<FileBlocking> fileBlockings = new List<FileBlocking>();
-        private static uint InspectionIDCounter = 0;
+        private static uint inspectionIDCounter = 0;
 
         /// <summary>
         /// Create CodeInspection for a string
@@ -107,7 +107,7 @@ namespace Morchul.CodeManager
         /// <returns>Next inspectionID</returns>
         private static uint GetNextInspectionID()
         {
-            return ++InspectionIDCounter;
+            return ++inspectionIDCounter;
         }
 
         /// <summary>

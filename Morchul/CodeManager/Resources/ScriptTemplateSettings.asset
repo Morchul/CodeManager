@@ -13,11 +13,9 @@ MonoBehaviour:
   m_Name: ScriptTemplateSettings
   m_EditorClassIdentifier: 
   ScriptFolders:
-  - Name: New Folder
-    Path: Assets/Scripts/Player/
-    ScanFor: 0200000003000000
+  - Name: Default Script folder
+    Path: Assets/Scripts/
+    CleanCodeRules: 
   Placeholders:
   - Name: namespace
     Value: Morchul.CodeManager
-  - Name: ScriptNam
-    Value: 
