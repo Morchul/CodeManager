@@ -130,7 +130,7 @@ namespace Morchul.CodeManager
         /// <returns>true if settings could be loaded</returns>
         private static bool LoadPlaceholderValues(out Placeholder[] placeholders, params string[] defaultValues)
         {
-            ScriptTemplateSettings settings = AssetDatabase.LoadAssetAtPath<ScriptTemplateSettings>(CodeManagerUtility.ScriptTemplateSettingsObject);
+            CodeManagerSettings settings = CodeManagerEditorUtility.LoadSettings();
             if (settings == null)
             {
                 Debug.LogError("There are no settings created yet for Script Templates. Please open Window: Code Manager -> Script Templates -> Settings once to auto create settings.");

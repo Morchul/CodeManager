@@ -10,7 +10,7 @@ namespace Morchul.CodeManager
     {
         private static SelectCleanCodeRulesWindow instance;
 
-        private CleanCodeSettings settings;
+        private CodeManagerSettings settings;
 
         private Vector2 scrollPos;
 
@@ -34,7 +34,7 @@ namespace Morchul.CodeManager
 
         private void OnEnable()
         {
-            LoadSettings();
+            settings = CodeManagerEditorUtility.LoadSettings();
 
             RemoveNotExistingCleanCodeRules();
         }
@@ -54,15 +54,6 @@ namespace Morchul.CodeManager
                 {
                     scriptFolder.CleanCodeRules.RemoveAt(i);
                 }
-            }
-        }
-
-        private void LoadSettings()
-        {
-            settings = AssetDatabase.LoadAssetAtPath<CleanCodeSettings>(CodeManagerUtility.CleanCodeSettingsObject);
-            if (settings == null)
-            {
-                return;
             }
         }
 

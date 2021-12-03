@@ -9,28 +9,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da8bc3cfbe6e4354fba747d8ed4fc716, type: 3}
-  m_Name: CleanCodeSettings
+  m_Script: {fileID: 11500000, guid: 06d489e5fda0e7249a4f33ab5edf08a4, type: 3}
+  m_Name: CodeManagerSettings
   m_EditorClassIdentifier: 
+  ScriptFolders: []
+  Placeholders: []
   UnwantedCodes:
   - Name: Empty Codeblock
     RegexIndex: 0
     Description: No empty code blocks allowed.
+    ID: 0
   CodeGuidelines:
   - Name: Method Name
     SearchRegexIndex: 1
     GroupName: identifier
     MatchRegexIndex: 5
     Description: Methods have to start with a capital letter
+    ID: 0
   - Name: Private field name
     SearchRegexIndex: 4
     GroupName: identifier
     MatchRegexIndex: 6
     Description: private fields have to start with a lowercase letter
+    ID: 0
   CodeDocumentations:
   - Name: Documentation on class
     RegexIndex: 2
     Description: Classes must be documented
+    ID: 0
   DocumentationRegex:
     Name: 
     Regex: '[^\S][\/]{2,3}.*\n?$'

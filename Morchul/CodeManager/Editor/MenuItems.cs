@@ -14,10 +14,10 @@ namespace Morchul.CodeManager
             CleanCodeConsole.ShowWindow();
         }
 
-        [MenuItem("Code Manager/Clean Code/Settings")]
-        private static void OpenCleanCodeSettings()
+        [MenuItem("Code Manager/Settings")]
+        private static void OpenCodeManagerSettings()
         {
-            CleanCodeSettingsWindow.ShowWindow();
+            CodeManagerSettingsWindow.ShowWindow();
         }
 
         [MenuItem("Code Manager/Script Templates/New script template")]
@@ -55,12 +55,6 @@ namespace Morchul.CodeManager
         private static void OpenCreateNewScriptWindow()
         {
             SelectScriptTemplateWindow.ShowWindow();
-        }
-
-        [MenuItem("Code Manager/Script Templates/Settings")]
-        private static void OpenScriptTemplateSettings()
-        {
-            ScriptTemplateSettingsWindow.ShowWindow();
         }
     }
 }

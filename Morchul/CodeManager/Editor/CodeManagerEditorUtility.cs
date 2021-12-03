@@ -11,11 +11,29 @@ namespace Morchul.CodeManager
     public static class CodeManagerEditorUtility
     {
 
+        private static CodeManagerSettings instance;
+
         #region Image Paths
         public const string UnwantedCodeImagePath = CodeManagerUtility.CodeManagerResourcePath + "UnwantedCodeImage.PNG";
         public const string CodeGuidelineImagePath = CodeManagerUtility.CodeManagerResourcePath + "CodeGuidelineImage.png";
         public const string DocumentationImagePath = CodeManagerUtility.CodeManagerResourcePath + "CodeDocumentationImage.png";
         #endregion
+
+        public static CodeManagerSettings LoadSettings(bool createNewIfNotExist = false)
+        {
+            if (instance == null)
+            {
+                instance = AssetDatabase.LoadAssetAtPath<CodeManagerSettings>(CodeManagerUtility.CodeManagerSettingsObject);
+                if (createNewIfNotExist && instance == null) //Settings do not exist create new
+                {
+                    instance = ScriptableObject.CreateInstance<CodeManagerSettings>();
+                    DefaultSettings.SetDefaultSettings(instance);
+                    AssetDatabase.CreateAsset(instance, CodeManagerUtility.CodeManagerSettingsObject);
+                    instance.UpdateRules();
+                }
+            }
+            return instance;
+        }
 
         /// <summary>
         /// Tests if path points to a folder under Assets which already exists
@@ -53,7 +71,10 @@ namespace Morchul.CodeManager
         /// <returns>The selected folder path or defaultPath if no valid path is selected</returns>
         public static string SelectFolderInAssets(string defaultPath)
         {
-            string path = EditorUtility.OpenFolderPanel("Select Folder", "Assets/Scripts", "");
+            string folderPath = "Assets/Scripts";
+            if (!AssetDatabase.IsValidFolder(folderPath))
+                folderPath = "Assets";
+            string path = EditorUtility.OpenFolderPanel("Select Folder", folderPath, "");
             CodeInspection pathInspection = CodeInspector.InspectText(path);
 
             if (string.IsNullOrEmpty(path)) return defaultPath;

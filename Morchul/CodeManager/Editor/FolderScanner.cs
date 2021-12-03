@@ -13,7 +13,7 @@ namespace Morchul.CodeManager
     public class FolderScanner
     {
         private ScriptFolder scriptFolder;
-        private readonly CleanCodeSettings cleanCodeSettings;
+        private readonly CodeManagerSettings settings;
 
         private static Texture2D unwantedCodeImage;
         private static Texture2D codeGuidelineImage;
@@ -21,9 +21,9 @@ namespace Morchul.CodeManager
 
         private readonly Dictionary<int, LinkedListNode<CodePiece>[]> searchedRegexes;
 
-        public FolderScanner(CleanCodeSettings cleanCodeSettings)
+        public FolderScanner(CodeManagerSettings settings)
         {
-            this.cleanCodeSettings = cleanCodeSettings;
+            this.settings = settings;
             searchedRegexes = new Dictionary<int, LinkedListNode<CodePiece>[]>();
         }
 
@@ -37,7 +37,7 @@ namespace Morchul.CodeManager
         {
             this.scriptFolder = scriptFolder;
             searchedRegexes.Clear();
-            if (scriptFolder.CleanCodeRules.Count == 0 || cleanCodeSettings.CleanCodeRules == null) return null; //Do not scan this folder
+            if (scriptFolder.CleanCodeRules.Count == 0 || settings.CleanCodeRules == null) return null; //Do not scan this folder
 
             List<CleanCodeViolation> ccvs = new List<CleanCodeViolation>();
             string[] scriptNames = GetAllSriptNames();
@@ -61,7 +61,7 @@ namespace Morchul.CodeManager
                 //Scan for every CleanCode rule
                 foreach (uint ruleID in scriptFolder.CleanCodeRules)
                 {
-                    if(cleanCodeSettings.CleanCodeRules.TryGetValue(ruleID, out ICleanCodeRule rule))
+                    if(settings.CleanCodeRules.TryGetValue(ruleID, out ICleanCodeRule rule))
                     {
                         
                         switch (rule.GetType())
@@ -134,7 +134,7 @@ namespace Morchul.CodeManager
                 {
                     //Check if documented
                     LinkedListNode<CodePiece> codePiece = codePieces[i];
-                    if (codePiece.Previous == null || !Regex.IsMatch(codePiece.Previous.Value.Code, cleanCodeSettings.DocumentationRegex.Regex))
+                    if (codePiece.Previous == null || !Regex.IsMatch(codePiece.Previous.Value.Code, settings.DocumentationRegex.Regex))
                     {
                         ccvs.Add(CleanCodeViolation.CreateCodeDocumentationMessage(scriptInspection.GetLineIndex(codePieces[i]), script, codeDocumentation.Description, scriptInspection.FileName, GetCodeDocumentationImage()));
                     }
@@ -165,7 +165,7 @@ namespace Morchul.CodeManager
                     LinkedListNode<CodePiece> codePiece = codePieces[i];
                     string groupValue = codePiece.Value.Match.Groups[codeGuideline.GroupName].Value;
 
-                    if (!Regex.IsMatch(groupValue, cleanCodeSettings.Regexes[codeGuideline.MatchRegexIndex].Regex))
+                    if (!Regex.IsMatch(groupValue, settings.Regexes[codeGuideline.MatchRegexIndex].Regex))
                     {
                         ccvs.Add(CleanCodeViolation.CreateCodeGuidelineMessage(scriptInspection.GetLineIndex(codePieces[i]), script, codeGuideline.Description, scriptInspection.FileName, GetCodeGuidelineImage()));
                     }
@@ -190,7 +190,7 @@ namespace Morchul.CodeManager
                 return true;
             }
 
-            if (scriptInspection.FindAll(cleanCodeSettings.Regexes[regexIndex].Regex, out searchResult))
+            if (scriptInspection.FindAll(settings.Regexes[regexIndex].Regex, out searchResult))
             {
                 searchedRegexes.Add(regexIndex, searchResult);
                 return true;

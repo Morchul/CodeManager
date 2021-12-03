@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Morchul.CodeManager
+/*namespace Morchul.CodeManager
 {
     /// <summary>
     /// The settings for ScriptTemplates where you can define all Placeholders and ScriptFolders.
@@ -11,4 +11,4 @@ namespace Morchul.CodeManager
         public ScriptFolder[] ScriptFolders;
         public Placeholder[] Placeholders;
     }
-}
+}*/

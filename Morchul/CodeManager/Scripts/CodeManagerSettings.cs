@@ -1,14 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/*namespace Morchul.CodeManager
+namespace Morchul.CodeManager
 {
     /// <summary>
+    /// All settings of CodeManager:
+    /// The settings for ScriptTemplates where you can define all Placeholders and ScriptFolders.
     /// The settings for CleanCode where you can define all CleanCodeRules and Regexes
-    /// The settings are saved as ScriptableObject under CodeManager/Resources/CleanCodeSettings
+    /// The settings are saved as ScriptableObject under CodeManager/Resources/CodeManagerSettings
     /// </summary>
-    public class CleanCodeSettings : ScriptableObject
+    public class CodeManagerSettings : ScriptableObject
     {
+        #region ScriptTemplates variables
+        public ScriptFolder[] ScriptFolders;
+        public Placeholder[] Placeholders;
+        #endregion
+
+        #region CleanCode variables
         public UnwantedCode[] UnwantedCodes;
         public CodeGuideline[] CodeGuidelines;
         public CodeDocumentation[] CodeDocumentations;
@@ -20,8 +28,9 @@ using UnityEngine;
         public Dictionary<uint, ICleanCodeRule> CleanCodeRules { get; private set; }
 
         private uint rulesIDCounter = 0;
+        #endregion
 
-        private event System.Action CleanCodeSettingsReady;
+        private event System.Action settingsReady;
 
         private void OnEnable()
         {
@@ -29,8 +38,8 @@ using UnityEngine;
             {
                 CleanCodeRules = new Dictionary<uint, ICleanCodeRule>();
                 UpdateRules();
-                CleanCodeSettingsReady?.Invoke();
-                CleanCodeSettingsReady = null;
+                settingsReady?.Invoke();
+                settingsReady = null;
             }
         }
 
@@ -38,7 +47,7 @@ using UnityEngine;
         {
             if (CleanCodeRules == null)
             {
-                CleanCodeSettingsReady += onReadyAction;
+                settingsReady += onReadyAction;
             }
             else
             {
@@ -46,9 +55,10 @@ using UnityEngine;
             }
         }
 
+        #region CleanCode methods
         private void AddICleanCodeRule(ICleanCodeRule rules)
         {
-            if(rules.IsValid())
+            if (rules.IsValid())
                 CleanCodeRules.Add(rules.GetID(), rules);
         }
 
@@ -62,7 +72,7 @@ using UnityEngine;
 
             for (int i = 0; i < UnwantedCodes.Length; ++i)
             {
-                if(UnwantedCodes[i].GetID() == 0)
+                if (UnwantedCodes[i].GetID() == 0)
                 {
                     UnwantedCodes[i].SetID(++rulesIDCounter);
                 }
@@ -87,5 +97,6 @@ using UnityEngine;
                 AddICleanCodeRule(CodeDocumentations[i]);
             }
         }
+        #endregion
     }
-}*/
+}

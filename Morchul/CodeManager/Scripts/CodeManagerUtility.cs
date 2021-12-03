@@ -12,8 +12,9 @@ namespace Morchul.CodeManager
         public const string CodeManagerPath = "Assets/Plugins/Morchul/CodeManager/";
         public const string CodeManagerResourcePath = CodeManagerPath + "Resources/";
         public const string ScriptTemplatePath = ScriptTemplateFolderPath + "/";
-        public const string ScriptTemplateSettingsObject = CodeManagerResourcePath + "ScriptTemplateSettings.asset";
-        public const string CleanCodeSettingsObject = CodeManagerResourcePath + "CleanCodeSettings.asset";
+        //public const string ScriptTemplateSettingsObject = CodeManagerResourcePath + "ScriptTemplateSettings.asset";
+        //public const string CleanCodeSettingsObject = CodeManagerResourcePath + "CleanCodeSettings.asset";
+        public const string CodeManagerSettingsObject = CodeManagerResourcePath + "CodeManagerSettings.asset";
 
         public const string ScriptTemplateFolder = "ScriptTemplates";
 

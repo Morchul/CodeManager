@@ -10,8 +10,7 @@ namespace Morchul.CodeManager
     {
         private static CleanCodeConsole instance;
 
-        private CleanCodeSettings cleanCodeSettings;
-        private ScriptTemplateSettings scriptTemplateSettings;
+        private CodeManagerSettings settings;
 
         private FolderScanner folderScanner;
 
@@ -40,7 +39,7 @@ namespace Morchul.CodeManager
 
         private void OnEnable()
         {
-            LoadSettings();
+            settings = CodeManagerEditorUtility.LoadSettings();
             selectedScriptTemplateIndex = -1;
 
             if (cleanCodeViolations == null)
@@ -48,29 +47,14 @@ namespace Morchul.CodeManager
                 cleanCodeViolations = new List<CleanCodeViolation>();
             }
 
-            if(cleanCodeSettings != null && scriptTemplateSettings != null && folderScanner == null)
+            if(settings != null && folderScanner == null)
             {
-                folderScanner = new FolderScanner(cleanCodeSettings);
+                folderScanner = new FolderScanner(settings);
             }
 
-            if(cleanCodeSettings != null && folderScanner != null)
+            if(settings != null && folderScanner != null)
             {
-                cleanCodeSettings.AddReadyListener(ScanFolders);
-            }
-        }
-
-        private void LoadSettings()
-        {
-            if (cleanCodeSettings == null)
-            {
-                cleanCodeSettings = AssetDatabase.LoadAssetAtPath<CleanCodeSettings>(CodeManagerUtility.CleanCodeSettingsObject);
-                if (cleanCodeSettings == null) return;
-            }
-
-            if (scriptTemplateSettings == null)
-            {
-                scriptTemplateSettings = AssetDatabase.LoadAssetAtPath<ScriptTemplateSettings>(CodeManagerUtility.ScriptTemplateSettingsObject);
-                if (scriptTemplateSettings == null) return;
+                settings.AddReadyListener(ScanFolders);
             }
         }
         
@@ -80,7 +64,7 @@ namespace Morchul.CodeManager
             if (folderScanner != null)
             {
                 cleanCodeViolations.Clear();
-                foreach (ScriptFolder folder in scriptTemplateSettings.ScriptFolders)
+                foreach (ScriptFolder folder in settings.ScriptFolders)
                 {
                     CleanCodeViolation[] ccvs = folderScanner.ScanFolder(folder);
                     if(ccvs != null)
@@ -98,7 +82,7 @@ namespace Morchul.CodeManager
         #region Draw
         private void OnGUI()
         {
-            if(cleanCodeSettings == null || scriptTemplateSettings == null)
+            if(settings == null)
             {
                 EditorGUILayout.HelpBox("ScriptTemplateSettings and CleanCodeSettings must be created. You can auto create the settings by once open the setting windows of CleanCode and ScriptTemplates.", MessageType.Warning);
                 OnEnable();

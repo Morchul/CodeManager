@@ -41,7 +41,7 @@ namespace Morchul.CodeManager
         private void LoadScriptFolders()
         {
             errorMessage = "";
-            ScriptTemplateSettings settings = AssetDatabase.LoadAssetAtPath<ScriptTemplateSettings>(CodeManagerUtility.ScriptTemplateSettingsObject);
+            CodeManagerSettings settings = CodeManagerEditorUtility.LoadSettings();
             if (settings == null)
             {
                 errorMessage = "There are no settings created yet for Script Templates. Please open Window: Code Manager -> Script Templates -> Settings once to auto create settings.";
@@ -60,7 +60,7 @@ namespace Morchul.CodeManager
         private void OnEnable()
         {
             LoadScriptFolders();
-            selectedFolderName = "SelectFolder";
+            selectedFolderName = "";
             informationText = "";
         }
 

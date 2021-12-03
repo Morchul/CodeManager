@@ -5,13 +5,16 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
-    public class CleanCodeSettingsWindow : EditorWindow
+    public class CodeManagerSettingsWindow : EditorWindow
     {
-        private static CleanCodeSettingsWindow instance;
+        private static CodeManagerSettingsWindow instance;
 
-        private CleanCodeSettings settings;
+        private CodeManagerSettings settings;
 
         private SerializedObject serializedSettings;
+
+        private CustomReorderableList scriptFolderList;
+        private CustomReorderableList placeHolderList;
 
         private CustomReorderableList unwantedCodeList;
         private CustomReorderableList codeDocumentationList;
@@ -22,27 +25,31 @@ namespace Morchul.CodeManager
 
         private Vector2 scrollPos;
 
-        private readonly string[] tabNames = new string[] { "Clean Code Rules", "Regexes" };
-        private int selectedTab;
-
-        private string[] regexNames;
-
         private const float MIN_WIDTH = 200;
         private const float MIN_HEIGHT = 150;
 
         private const float BORDER_WIDTH = 10;
 
+        private readonly string[] tabNames = new string[] { "Script Templates", "Clean Code Rules", "Regexes" };
+        private int selectedTab;
+
+        private string[] regexNames;
+
         public static void ShowWindow()
         {
-            instance = CreateInstance<CleanCodeSettingsWindow>();
+            instance = CreateInstance<CodeManagerSettingsWindow>();
             instance.minSize = new Vector2(MIN_WIDTH, MIN_HEIGHT);
-            instance.titleContent = new GUIContent("CleanCode settings");
+            instance.titleContent = new GUIContent("Code manager settings");
             instance.Show();
         }
 
         private void OnEnable()
         {
-            LoadSettings();
+            settings = CodeManagerEditorUtility.LoadSettings(true);
+            serializedSettings = new SerializedObject(settings);
+
+            CreateScriptFolderList();
+            CreatePlaceholderList();
 
             CreateUnwantedCodeList();
             CreateRegexesList();
@@ -55,31 +62,157 @@ namespace Morchul.CodeManager
             settings.UpdateRules();
         }
 
-        private void LoadSettings()
-        {
-            settings = AssetDatabase.LoadAssetAtPath<CleanCodeSettings>(CodeManagerUtility.CleanCodeSettingsObject);
-            if (settings == null) //Settings do not exist create new
-            {
-                settings = ScriptableObject.CreateInstance<CleanCodeSettings>();
-                DefaultSettings.SetDefaultCleanCodeSettings(settings);
-                AssetDatabase.CreateAsset(settings, CodeManagerUtility.CleanCodeSettingsObject);
-                settings.UpdateRules();
-            }
+        #region Listcreation
 
-            serializedSettings = new SerializedObject(settings);
+        private void CreateScriptFolderList()
+        {
+            scriptFolderList = new CustomReorderableList(serializedSettings, serializedSettings.FindProperty("ScriptFolders"), settings.ScriptFolders.Length)
+            {
+                onCreateNewItemCallback = (element) =>
+                {
+                    element.FindPropertyRelative("Name").stringValue = "New Folder";
+                    element.FindPropertyRelative("Path").stringValue = "Assets/Scripts/";
+                },
+
+                onElementDrawCallback = (Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list) =>
+                {
+                    SerializedProperty scriptFolder = list.serializedProperty.GetArrayElementAtIndex(index);
+                    SerializedProperty nameProperty = scriptFolder.FindPropertyRelative("Name");
+                    SerializedProperty pathProperty = scriptFolder.FindPropertyRelative("Path");
+                    SerializedProperty documentationFlags = scriptFolder.FindPropertyRelative("ScanFor");
+
+                    Rect foldoutRect = rect;
+                    if (list.ElementExpanded[index])
+                        foldoutRect.y -= list.ElementHeights[index] / 2 - list.LIST_ELEMENT_HEIGHT / 2;
+
+                    list.ElementExpanded[index] = EditorGUI.Foldout(foldoutRect, list.ElementExpanded[index], nameProperty.stringValue, false);
+                    if (list.ElementExpanded[index])
+                    {
+                        //Add name
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "Name of the Scriptfolder. Displayed when you create a new script and have to choose a folder"));
+                        EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 52, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
+
+                        //Add Path
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Path", "The Path of the folder, has to end with a '/' e.g: Assets/Scripts/"));
+                        EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 150, EditorGUIUtility.singleLineHeight), pathProperty, GUIContent.none);
+
+                        //Add Selectfolder button
+                        if (GUI.Button(new Rect(rect.x + rect.width - 90, rect.y, 90, EditorGUIUtility.singleLineHeight), new GUIContent("Select Folder", "Browse for a folder in your explorer. The Folder has to be under Assets/")))
+                        {
+                            pathProperty.stringValue = CodeManagerEditorUtility.SelectFolderInAssets(pathProperty.stringValue);
+                            Repaint();
+                        }
+
+                        //Add Scan selection button
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        if (GUI.Button(new Rect(rect.x, rect.y, 230, EditorGUIUtility.singleLineHeight), "Select CleanCode rules for this folder"))
+                        {
+                            SelectCleanCodeRulesWindow.ShowWindow(settings.ScriptFolders[index]);
+                        }
+
+                        //Add errorbox by wrong path name
+                        if (!CodeManagerEditorUtility.IsValidAssetsFolderPath(pathProperty.stringValue))
+                        {
+                            rect.y += list.LIST_ELEMENT_HEIGHT;
+                            EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, 40), "This is not a valid folder path.", MessageType.Error);
+                        }
+                    }
+                },
+
+                onElementHeightCallback = (int index, CustomReorderableList list) =>
+                {
+                    if (list.ElementExpanded[index])
+                    {
+                        SerializedProperty scriptFolder = list.serializedProperty.GetArrayElementAtIndex(index);
+                        SerializedProperty pathProperty = scriptFolder.FindPropertyRelative("Path");
+
+                        if (!CodeManagerEditorUtility.IsValidAssetsFolderPath(pathProperty.stringValue))
+                        {
+                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 4 + 40;
+                        }
+                        else
+                        {
+                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 4;
+                        }
+                    }
+                    else
+                    {
+                        list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT;
+                    }
+                    return list.ElementHeights[index];
+                }
+            };
+
         }
 
-        private string[] GetRegexNames()
+        private void CreatePlaceholderList()
         {
-            string[] names = new string[settings.Regexes.Length];
-            for(int i = 0; i < names.Length; ++i)
+            placeHolderList = new CustomReorderableList(serializedSettings, serializedSettings.FindProperty("Placeholders"), settings.Placeholders.Length)
             {
-                names[i] = settings.Regexes[i].Name;
-            }
-            return names;
+                onCreateNewItemCallback = (element) =>
+                {
+                    element.FindPropertyRelative("Name").stringValue = "New Placeholder";
+                    element.FindPropertyRelative("Value").stringValue = "";
+                },
+
+                onElementDrawCallback = (Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list) =>
+                {
+                    SerializedProperty placeholder = list.serializedProperty.GetArrayElementAtIndex(index);
+                    SerializedProperty nameProperty = placeholder.FindPropertyRelative("Name");
+
+                    Rect foldoutRect = rect;
+                    if (list.ElementExpanded[index])
+                        foldoutRect.y -= list.ElementHeights[index] / 2 - list.LIST_ELEMENT_HEIGHT / 2;
+
+                    list.ElementExpanded[index] = EditorGUI.Foldout(foldoutRect, list.ElementExpanded[index], nameProperty.stringValue, false);
+
+                    if (list.ElementExpanded[index])
+                    {
+                        //First Add name
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Name", "The name of the placeholder. Has to be written without % at the begin and end."));
+                        EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), nameProperty, GUIContent.none);
+
+                        //Second add Value
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Value", "The value through which the placeholder will be replaced by script creation."));
+                        EditorGUI.PropertyField(new Rect(rect.x + 50, rect.y, rect.width - 50, EditorGUIUtility.singleLineHeight), placeholder.FindPropertyRelative("Value"), GUIContent.none);
+
+                        //Add errorbox by wrong path name
+                        if (ScriptCreator.IsDefaultPlaceholderName(nameProperty.stringValue))
+                        {
+                            rect.y += list.LIST_ELEMENT_HEIGHT;
+                            EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, 40), "The Placeholder name: \"" + nameProperty.stringValue + "\" is a default placeholder name and can not be used!", MessageType.Error);
+                        }
+                    }
+                },
+                onElementHeightCallback = (int index, CustomReorderableList list) =>
+                {
+                    if (list.ElementExpanded[index])
+                    {
+                        SerializedProperty scriptFolder = list.serializedProperty.GetArrayElementAtIndex(index);
+                        SerializedProperty nameProperty = scriptFolder.FindPropertyRelative("Name");
+
+                        if (ScriptCreator.IsDefaultPlaceholderName(nameProperty.stringValue))
+                        {
+                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 3 + 40;
+                        }
+                        else
+                        {
+                            list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT * 3;
+                        }
+                    }
+                    else
+                    {
+                        list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT;
+                    }
+                    return list.ElementHeights[index];
+                }
+            };
         }
 
-        #region List creation
         private void CreateUnwantedCodeList()
         {
             unwantedCodeList = new CustomReorderableList(serializedSettings, serializedSettings.FindProperty("UnwantedCodes"), settings.UnwantedCodes.Length)
@@ -112,13 +245,13 @@ namespace Morchul.CodeManager
 
                         //Second add Description
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), new GUIContent("Description","The description will be displayed in the CleanCode Console if a UnwantedCode Violation appears to show the user what is wrong."));
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 70, EditorGUIUtility.singleLineHeight), new GUIContent("Description", "The description will be displayed in the CleanCode Console if a UnwantedCode Violation appears to show the user what is wrong."));
                         EditorGUI.PropertyField(new Rect(rect.x + 70, rect.y, rect.width - 70, EditorGUIUtility.singleLineHeight), unwantedCode.FindPropertyRelative("Description"), GUIContent.none);
 
                         //Third add Regex
                         rect.y += list.LIST_ELEMENT_HEIGHT;
                         EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, EditorGUIUtility.singleLineHeight), new GUIContent("Regex", "If this regex matches something in the code a UnwantedCode message will be displayed in the CleanCode Console."));
-                        if(regexProperty.intValue < 0)
+                        if (regexProperty.intValue < 0)
                         {
                             Color defaultColor = GUI.backgroundColor;
                             GUI.backgroundColor = Color.red;
@@ -256,7 +389,7 @@ namespace Morchul.CodeManager
                         //Third add SearchRegex and GroupName
                         rect.y += list.LIST_ELEMENT_HEIGHT;
                         EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), new GUIContent("Search Regex", "This Regex searches for the Code which has to be checked for Code guideline. If something is found the text marked by the GroupName will be checked with the Match Regex."));
-                        
+
                         if (searchRegexProperty.intValue < 0)
                         {
                             Color defaultColor = GUI.backgroundColor;
@@ -270,7 +403,7 @@ namespace Morchul.CodeManager
                         }
 
                         EditorGUI.LabelField(new Rect(rect.x + 400, rect.y, 80, EditorGUIUtility.singleLineHeight), new GUIContent("Group Name", "Defines which part of the SearchRegex will be testet with the MatchRegex."));
-                        
+
                         if (string.IsNullOrEmpty(groupNameProperty.stringValue))
                         {
                             Color defaultColor = GUI.backgroundColor;
@@ -297,7 +430,7 @@ namespace Morchul.CodeManager
                         {
                             matchRegexProperty.intValue = EditorGUI.Popup(new Rect(rect.x + 90, rect.y, rect.width - 90, EditorGUIUtility.singleLineHeight), matchRegexProperty.intValue, regexNames);
                         }
-                        
+
 
                     }
                 },
@@ -333,7 +466,7 @@ namespace Morchul.CodeManager
                     for (int i = 0; i < settings.UnwantedCodes.Length; ++i)
                     {
                         //Regex was deleted
-                        if(settings.UnwantedCodes[i].RegexIndex == index)
+                        if (settings.UnwantedCodes[i].RegexIndex == index)
                         {
                             settings.UnwantedCodes[i].RegexIndex = -1;
                         }
@@ -445,10 +578,10 @@ namespace Morchul.CodeManager
                 }
             };
         }
+
         #endregion
 
         #region Draw
-
         private void OnGUI()
         {
             if (settings == null) return;
@@ -462,13 +595,15 @@ namespace Morchul.CodeManager
 
             switch (selectedTab)
             {
-                case 0: DrawCleanCodeSettingsTab(); break;
-                case 1: DrawRegexesTab(); break;
+                case 0: DrawScriptTemplateSettingsTab(); break;
+                case 1: DrawCleanCodeSettingsTab(); break;
+                case 2: DrawRegexesTab(); break;
             }
-            
+
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
         }
+
 
         private void DrawCleanCodeSettingsTab()
         {
@@ -499,7 +634,7 @@ namespace Morchul.CodeManager
             {
                 codeDocumentationList.DoLayoutList();
             }
-            
+
 
             EditorGUILayout.Space(5);
 
@@ -530,8 +665,43 @@ namespace Morchul.CodeManager
             EditorGUILayout.EndVertical();
         }
 
+        private void DrawScriptTemplateSettingsTab()
+        {
+
+            EditorGUILayout.BeginVertical();
+
+            scriptFolderList.Expanded = EditorGUILayout.Foldout(scriptFolderList.Expanded, "Script Folders");
+            if (scriptFolderList.Expanded)
+            {
+                serializedSettings.Update();
+                scriptFolderList.DoLayoutList();
+                serializedSettings.ApplyModifiedProperties();
+            }
+
+            EditorGUILayout.Space(10);
+
+            placeHolderList.Expanded = EditorGUILayout.Foldout(placeHolderList.Expanded, "Placeholders");
+            if (placeHolderList.Expanded)
+            {
+                serializedSettings.Update();
+                placeHolderList.DoLayoutList();
+                serializedSettings.ApplyModifiedProperties();
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
         #endregion
+
+        private string[] GetRegexNames()
+        {
+            string[] names = new string[settings.Regexes.Length];
+            for (int i = 0; i < names.Length; ++i)
+            {
+                names[i] = settings.Regexes[i].Name;
+            }
+            return names;
+        }
     }
 }
-
 #endif
