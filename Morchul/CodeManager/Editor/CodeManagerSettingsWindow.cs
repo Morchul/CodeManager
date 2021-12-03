@@ -37,7 +37,7 @@ namespace Morchul.CodeManager
 
         public static void ShowWindow()
         {
-            instance = CreateInstance<CodeManagerSettingsWindow>();
+            instance = GetWindow<CodeManagerSettingsWindow>();
             instance.minSize = new Vector2(MIN_WIDTH, MIN_HEIGHT);
             instance.titleContent = new GUIContent("Code manager settings");
             instance.Show();
@@ -72,6 +72,7 @@ namespace Morchul.CodeManager
                 {
                     element.FindPropertyRelative("Name").stringValue = "New Folder";
                     element.FindPropertyRelative("Path").stringValue = "Assets/Scripts/";
+                    element.FindPropertyRelative("IncludeSubDirectory").boolValue = false;
                 },
 
                 onElementDrawCallback = (Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list) =>
@@ -105,9 +106,14 @@ namespace Morchul.CodeManager
                             Repaint();
                         }
 
-                        //Add Scan selection button
+                        //Add Include sub-directory toggle
                         rect.y += list.LIST_ELEMENT_HEIGHT;
-                        if (GUI.Button(new Rect(rect.x, rect.y, 230, EditorGUIUtility.singleLineHeight), "Select CleanCode rules for this folder"))
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 110, EditorGUIUtility.singleLineHeight), new GUIContent("Include sub folders", "If set the Clean code rules also applie to all sub folders"));
+                        EditorGUI.PropertyField(new Rect(rect.x + 110, rect.y, 40, EditorGUIUtility.singleLineHeight), scriptFolder.FindPropertyRelative("IncludeSubDirectory"), GUIContent.none);
+
+
+                        //Add CleanCode rule selection button
+                        if (GUI.Button(new Rect(rect.x + 180, rect.y, 230, EditorGUIUtility.singleLineHeight), "Select CleanCode rules for this folder"))
                         {
                             SelectCleanCodeRulesWindow.ShowWindow(settings.ScriptFolders[index]);
                         }

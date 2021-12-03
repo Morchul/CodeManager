@@ -205,7 +205,8 @@ namespace Morchul.CodeManager
         /// <returns>All script names with extension</returns>
         private string[] GetAllSriptNames()
         {
-            return Directory.GetFiles(CodeManagerUtility.ConvertToOpertingSystemPath(scriptFolder.Path), "*.cs", SearchOption.TopDirectoryOnly);
+            SearchOption searchOption = scriptFolder.IncludeSubDirectory ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            return Directory.GetFiles(CodeManagerUtility.ConvertToOpertingSystemPath(scriptFolder.Path), "*.cs", searchOption);
         }
 
         /// <summary>

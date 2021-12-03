@@ -49,6 +49,15 @@ namespace Morchul.CodeManager
             return false;
         }
 
+        public static bool IsValidFolderPath(string path)
+        {
+            if (Regex.IsMatch(path, @"/$"))
+            {
+                return AssetDatabase.IsValidFolder(path.Remove(path.Length - 1));
+            }
+            return false;
+        }
+
         /// <summary>
         /// Tests if path points to a folder under Assets/ScriptTemplates which already exists
         /// </summary>

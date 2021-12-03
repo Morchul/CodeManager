@@ -25,11 +25,16 @@ namespace Morchul.CodeManager
 
         private int selectedScriptTemplateIndex;
 
+        private string path;
+
         //private Texture2D scriptTemplateImage;
 
-        public static void ShowWindow()
+        public static void ShowWindow(string path = "")
         {
-            instance = CreateInstance<SelectScriptTemplateWindow>();
+            instance = GetWindow<SelectScriptTemplateWindow>();
+
+            instance.path = path;
+
             instance.minSize = new Vector2(MIN_WIDTH, MIN_HEIGHT);
             instance.titleContent = new GUIContent("Select script template");
             instance.Show();
@@ -112,8 +117,9 @@ namespace Morchul.CodeManager
         {
             if(selectedScriptTemplateIndex != -1)
             {
-                CreateScriptWindow.ShowWindow(scriptTemplates[selectedScriptTemplateIndex]);
+                CreateScriptWindow.ShowWindow(scriptTemplates[selectedScriptTemplateIndex], path);
                 selectedScriptTemplateIndex = -1;
+                instance.Close();
             }
         }
 

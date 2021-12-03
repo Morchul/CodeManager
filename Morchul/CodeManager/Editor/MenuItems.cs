@@ -8,6 +8,19 @@ namespace Morchul.CodeManager
     //All MenuItems under CodeManager
     public class MenuItems
     {
+        [MenuItem("Assets/Create/Script from template", priority = 1)]
+        private static void CreateScript()
+        {
+            SelectScriptTemplateWindow.ShowWindow(AssetDatabase.GetAssetPath(Selection.activeObject) + "/");
+        }
+
+        [MenuItem("Assets/Create/Script from template", validate = true)]
+        private static bool CreateScriptValidation()
+        {
+            return CodeManagerEditorUtility.IsValidFolderPath(AssetDatabase.GetAssetPath(Selection.activeObject) + "/");
+        }
+
+
         [MenuItem("Code Manager/Clean Code/Console %m")]
         private static void OpenCleanCodeManager()
         {

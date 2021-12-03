@@ -11,7 +11,7 @@ namespace Morchul.CodeManager
         private static CreateScriptWindow instance;
 
         private const float MIN_WIDTH = 200;
-        private const float MIN_HEIGHT = 140;
+        private const float MIN_HEIGHT = 150;
 
         private const float BORDER_WIDTH = 10;
 
@@ -24,15 +24,19 @@ namespace Morchul.CodeManager
         private ScriptFolder[] scriptFolders;
 
         private ScriptFolder selectedScriptFolder;
+        private string path;
 
-        private static ScriptTemplate scriptTemplate;
+        private ScriptTemplate scriptTemplate;
 
         private string errorMessage;
 
-        public static void ShowWindow(ScriptTemplate scriptTemplate)
+        public static void ShowWindow(ScriptTemplate scriptTemplate, string path)
         {
-            CreateScriptWindow.scriptTemplate = scriptTemplate;
-            instance = CreateInstance<CreateScriptWindow>();
+            instance = GetWindow<CreateScriptWindow>();
+
+            instance.scriptTemplate = scriptTemplate;
+            instance.path = path;
+
             instance.minSize = new Vector2(MIN_WIDTH, MIN_HEIGHT);
             instance.titleContent = new GUIContent("Create new script");
             instance.Show();
@@ -88,7 +92,7 @@ namespace Morchul.CodeManager
             EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Select Folder: ", "The folder where the new script will be created."), GUILayout.Width(100));
+            EditorGUILayout.LabelField(new GUIContent("Select Folder: ", "Select a folder from Scriptfolder to create the script in."), GUILayout.Width(100));
             
             if (EditorGUILayout.DropdownButton(new GUIContent(selectedFolderName), FocusType.Passive))
             {
@@ -101,29 +105,40 @@ namespace Morchul.CodeManager
                 foldersToSelect.DropDown(GUILayoutUtility.GetLastRect());
             }
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.LabelField("Select a folder from above or input the path manually:");
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Creation Path: ", "The path where the new script will be created."), GUILayout.Width(100));
+            path = EditorGUILayout.TextField(path, GUILayout.ExpandWidth(true));
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(10);
 
-            EditorGUILayout.EndVertical();
-            
-
-            Rect buttonRect = new Rect(0, BORDER_WIDTH + EditorGUIUtility.singleLineHeight * 3, 150, 30);
-            if (GUI.Button(buttonRect, new GUIContent("Create Script")))
+            if (CodeManagerEditorUtility.IsValidFolderPath(path))
             {
-                CreateNewScript();
+                Rect buttonRect = new Rect(0, BORDER_WIDTH + EditorGUIUtility.singleLineHeight * 5, 150, 30);
+                if (GUI.Button(buttonRect, new GUIContent("Create Script")))
+                {
+                    CreateNewScript();
+                }
+                Rect informationRect = new Rect(160, buttonRect.y + 5, position.width - BORDER_WIDTH * 2, EditorGUIUtility.singleLineHeight);
+                EditorGUI.LabelField(informationRect, informationText);
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Invalid path!", MessageType.Error);
             }
 
-            Rect informationRect = new Rect(0, buttonRect.y + 40, position.width - BORDER_WIDTH * 2, EditorGUIUtility.singleLineHeight);
-            EditorGUI.LabelField(informationRect, informationText);
+            EditorGUILayout.EndVertical();
 
             GUILayout.EndArea();
         }
 
         private void CreateNewScript()
         {
-            if(string.IsNullOrEmpty(selectedScriptFolder.Path))
+            if(string.IsNullOrEmpty(path))
             {
-                informationText = "No Folder selected!";
+                informationText = "Invalid creation Path!";
                 Debug.LogWarning(informationText);
                 return;
             }
@@ -152,6 +167,8 @@ namespace Morchul.CodeManager
             {
                 selectedFolderName = scriptFolder.Name;
                 selectedScriptFolder = scriptFolder;
+                path = selectedScriptFolder.Path;
+                Repaint();
             }
         }
         #endregion
