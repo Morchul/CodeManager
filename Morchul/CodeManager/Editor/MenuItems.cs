@@ -5,7 +5,9 @@ using UnityEditor;
 
 namespace Morchul.CodeManager
 {
-    //All MenuItems under CodeManager
+    /// <summary>
+    /// All MenuItems under Code Manager
+    /// </summary>
     public class MenuItems
     {
         [MenuItem("Assets/Create/Script from template", priority = 1)]

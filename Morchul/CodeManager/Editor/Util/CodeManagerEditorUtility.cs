@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -103,45 +105,24 @@ namespace Morchul.CodeManager
         }
 
         /// <summary>
-        /// Calculates the Size of a text. Works only with default Text from Unity with height 12.
-        /// </summary>
-        /// <param name="text">The Text which size should be calculated</param>
-        /// <returns>The size of the text (height always 12)</returns>
-        /*public static Vector2 CalcTextSizeOfDefaultFont(string text)
-        {
-            if(text == "\n")
-            {
-                return new Vector2(0, 12);
-            }
-
-            Vector2 size = GUI.skin.box.CalcSize(new GUIContent(text));
-            Debug.Log("size: " + size);
-            size.x -= 7;
-            string tempText = Regex.Replace(text, @"[ |\t]+", " "); //Replace every space and tab list through one space
-            size.x += tempText.Length - tempText.Replace(" ", "").Length; //For every space add one pixel to the length
-            size.y = 12;
-            return size;
-        }*/
-
-        /// <summary>
         /// Calculates the Width of a text in pixel.
         /// </summary>
         /// <param name="text">The text which width should be calculated</param>
         /// <param name="font">The font used by the text</param>
-        /// <param name="fontsize">The fontsize of the text</param>
+        /// <param name="fontSize">The fontsize of the text</param>
         /// <param name="fontstyle">The fontstyle of the text default = Normal</param>
         /// <returns></returns>
-        public static int CalcTextWidth(string text, Font font, FontStyle fontstyle = FontStyle.Normal)
+        public static int CalcTextWidth(string text, Font font, int fontSize, FontStyle fontstyle = FontStyle.Normal)
         {
             if (string.IsNullOrEmpty(text))
                 return 0;
 
             int w = 0;
-            font.RequestCharactersInTexture(text, font.fontSize, fontstyle);
+            font.RequestCharactersInTexture(text, fontSize, fontstyle);
 
             foreach (char c in text)
             {
-                font.GetCharacterInfo(c, out CharacterInfo cInfo, font.fontSize);
+                font.GetCharacterInfo(c, out CharacterInfo cInfo, fontSize);
                 w += cInfo.advance;
             }
 
@@ -151,3 +132,4 @@ namespace Morchul.CodeManager
     }
 }
 
+#endif

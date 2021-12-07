@@ -6,6 +6,9 @@ using UnityEditor;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// The Clean Code console where all clean code violations will be displayed
+    /// </summary>
     public class CleanCodeConsole : EditorWindow
     {
         private static CleanCodeConsole instance;

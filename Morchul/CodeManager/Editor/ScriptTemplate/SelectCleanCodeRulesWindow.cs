@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// A selection List from all clean code rules to choose for which will be scanned.
+    /// </summary>
     public class SelectCleanCodeRulesWindow : EditorWindow
     {
         private static SelectCleanCodeRulesWindow instance;
@@ -23,6 +26,10 @@ namespace Morchul.CodeManager
 
         private static ScriptFolder scriptFolder;
 
+        /// <summary>
+        /// Method to show the window
+        /// </summary>
+        /// <param name="scriptFolder">The script folder for which the clean code rules are selected</param>
         public static void ShowWindow(ScriptFolder scriptFolder)
         {
             SelectCleanCodeRulesWindow.scriptFolder = scriptFolder;

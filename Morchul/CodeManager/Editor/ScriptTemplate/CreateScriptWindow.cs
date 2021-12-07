@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// Window where script name and creation path are defined and where the final create command is executed.
+    /// </summary>
     public class CreateScriptWindow : EditorWindow
     {
         private static CreateScriptWindow instance;
@@ -30,6 +33,11 @@ namespace Morchul.CodeManager
 
         private string errorMessage;
 
+        /// <summary>
+        /// Method to show the window
+        /// </summary>
+        /// <param name="scriptTemplate">The Scripttemplate from which the script should be created</param>
+        /// <param name="path">The path where the script should be created, can still be changed in window</param>
         public static void ShowWindow(ScriptTemplate scriptTemplate, string path)
         {
             instance = GetWindow<CreateScriptWindow>();

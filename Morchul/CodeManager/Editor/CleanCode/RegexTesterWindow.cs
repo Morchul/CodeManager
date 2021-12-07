@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -5,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// A simple window to test regexes and correct existing ones.
+    /// </summary>
     public class RegexTesterWindow : EditorWindow
     {
         private static RegexTesterWindow instance;
@@ -13,6 +18,10 @@ namespace Morchul.CodeManager
         private const float MIN_HEIGHT = 150;
 
         private const float BORDER_WIDTH = 10;
+
+        private const int FONT_SIZE = 14;
+        private const int PADDING = 5;
+        private const int LINE_HEIHGT = FONT_SIZE + 3;
 
         private CodeManagerSettings settings;
 
@@ -34,6 +43,10 @@ namespace Morchul.CodeManager
 
         private RegexTesterMatch currentSelectedMatch;
 
+        /// <summary>
+        /// Method to show the window
+        /// </summary>
+        /// <param name="selectedRegexIndex">Index of the regex in Settings.Regexes[] which should be edited</param>
         public static void ShowWindow(int selectedRegexIndex)
         {
             instance = GetWindow<RegexTesterWindow>();
@@ -86,6 +99,40 @@ namespace Morchul.CodeManager
         }
 
         #region Regex Matches
+
+        #region class and structs
+        private class RegexTesterMatches : ScriptableObject
+        {
+            public RegexTesterMatch[] Matches;
+        }
+
+        [System.Serializable]
+        private struct RegexTesterMatch
+        {
+
+            public static RegexTesterMatch Null;
+
+            public string MatchText;
+
+            public int LineIndex;
+            public float LinePosIndex;
+
+            public RegexTesterGroup[] MatchGroups;
+
+            public bool IsNull()
+            {
+                return string.IsNullOrEmpty(MatchText);
+            }
+        }
+
+        [System.Serializable]
+        private struct RegexTesterGroup
+        {
+            public string Name;
+            public string Value;
+        }
+        #endregion
+
         private void Search()
         {
             if (string.IsNullOrEmpty(text)) return;
@@ -142,13 +189,13 @@ namespace Morchul.CodeManager
                 if (indexOfLastNewLine >= 0)
                 {
                     temp = previousCode.Substring(indexOfLastNewLine);                    
-                    LinePosIndex += CodeManagerEditorUtility.CalcTextWidth(temp, GUI.skin.font);
+                    LinePosIndex += CodeManagerEditorUtility.CalcTextWidth(temp, GUI.skin.font, FONT_SIZE);
                     break;
                 }
                 else
                 {
                     temp = previousCode;
-                    LinePosIndex += CodeManagerEditorUtility.CalcTextWidth(temp, GUI.skin.font);
+                    LinePosIndex += CodeManagerEditorUtility.CalcTextWidth(temp, GUI.skin.font, FONT_SIZE);
                 }
                 previous = previous.Previous;
 
@@ -170,6 +217,7 @@ namespace Morchul.CodeManager
             {
                 imagePosition = ImagePosition.TextOnly,
                 padding = new RectOffset(PADDING, PADDING, PADDING, PADDING),
+                fontSize = FONT_SIZE,
             };
             style.normal.background = null;
             style.normal.textColor = textColor;
@@ -215,6 +263,7 @@ namespace Morchul.CodeManager
             }
 
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+
             EditorGUILayout.BeginVertical("TextArea");
 
             RegexTesterMatch selectedMatch = DrawMatches();
@@ -223,7 +272,15 @@ namespace Morchul.CodeManager
                 currentSelectedMatch = selectedMatch;
             }
 
+            string previousText = text;
             text = EditorGUILayout.TextArea(text, GetTextAreaStyle(), GUILayout.ExpandHeight(true));
+
+            //Only check for length for performance improvement
+            if(previousText.Length != text.Length)
+            {
+                regexMatches.Matches = null;
+            }
+
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
 
@@ -267,16 +324,13 @@ namespace Morchul.CodeManager
             GUILayout.EndArea();
         }
 
-        private const int LINE_HEIHGT = 15;
-        private const int PADDING = 5;
-
         private RegexTesterMatch DrawMatches()
         {
             if (regexMatches.Matches == null || regexMatches.Matches.Length == 0) return RegexTesterMatch.Null;
 
             foreach(RegexTesterMatch match in regexMatches.Matches)
             {
-                Vector2 size = new Vector2(CodeManagerEditorUtility.CalcTextWidth(match.MatchText, GUI.skin.font), 12);
+                Vector2 size = new Vector2(CodeManagerEditorUtility.CalcTextWidth(match.MatchText, GUI.skin.font, FONT_SIZE), FONT_SIZE);
                 Rect rect = new Rect(match.LinePosIndex + (PADDING * 2), LINE_HEIHGT * (match.LineIndex - 1) + PADDING * 2, size.x, size.y);
                 EditorGUI.DrawRect(rect, highlightColor);
 
@@ -294,3 +348,5 @@ namespace Morchul.CodeManager
         #endregion
     }
 }
+
+#endif

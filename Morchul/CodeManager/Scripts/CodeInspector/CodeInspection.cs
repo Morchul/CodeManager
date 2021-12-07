@@ -287,7 +287,17 @@ namespace Morchul.CodeManager
                 ? Regex.Matches(CompleteCode, regex, Settings.RegexOptions)
                 : Regex.Matches(CompleteCode, regex, Settings.RegexOptions, Settings.RegexTimeout);
 
+            if (settings.RegexOptions.HasFlag(RegexOptions.RightToLeft))
+            {
+                //RegexOptions.RightToLeft is curretly not supported
+                //codePieces = CutCompleteCodeRightToLeft(matches);
+                Debug.LogError("Regex option: RightToLeft is currently not supported.");
+                codePieces = null;
+                return false;
+            }
+            
             codePieces = CutCompleteCode(matches);
+
             return codePieces.Length > 0;
         }
 
@@ -534,6 +544,40 @@ namespace Morchul.CodeManager
 
             return codePieces;
         }
+
+        // Same as CutCompleteCode but with RegexOption RightToLeft. Currently not supported
+        /*private LinkedListNode<CodePiece>[] CutCompleteCodeRightToLeft(MatchCollection matchCollection)
+        {
+            LinkedListNode<CodePiece>[] codePieces = new LinkedListNode<CodePiece>[matchCollection.Count];
+
+            int currentStartIndex = CompleteCode.Length;
+            int startIndex, endIndex;
+            for (int i = 0; i < matchCollection.Count; ++i)
+            {
+                Match match = matchCollection[i];
+                startIndex = match.Index;
+                endIndex = match.Index + match.Length;
+
+                if (endIndex < currentStartIndex)
+                {
+                    codePiecesList.AddLast(CreateCodePiece(CompleteCode.Substring(endIndex, currentStartIndex - endIndex))); // If something is before the match add this
+                }
+                else if (endIndex > currentStartIndex)
+                {
+                    throw new Exception("The next endIndex is after the last startIndex!!");
+                }
+
+                codePieces[i] = codePiecesList.AddLast(CreateCodePiece(match)); //Add the match
+                currentStartIndex = startIndex;
+            }
+
+            if (currentStartIndex > 0)
+            {
+                codePiecesList.AddLast(CreateCodePiece(CompleteCode.Substring(0, currentStartIndex))); //Add the rest of the code after every match
+            }
+
+            return codePieces;
+        }*/
 
         /// <summary>
         /// Resets CodeInspection values so new CodePieces can be created

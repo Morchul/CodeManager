@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// A selection List from all script templates
+    /// </summary>
     public class SelectScriptTemplateWindow : EditorWindow
     {
         private static SelectScriptTemplateWindow instance;
@@ -27,8 +30,10 @@ namespace Morchul.CodeManager
 
         private string path;
 
-        //private Texture2D scriptTemplateImage;
-
+        /// <summary>
+        /// Method to show the window
+        /// </summary>
+        /// <param name="path">A default path where the script should be created. Can still be changed in CreateScriptWindow</param>
         public static void ShowWindow(string path = "")
         {
             instance = GetWindow<SelectScriptTemplateWindow>();

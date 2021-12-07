@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Morchul.CodeManager
 {
+    /// <summary>
+    /// Code Manager settings window
+    /// </summary>
     public class CodeManagerSettingsWindow : EditorWindow
     {
         private static CodeManagerSettingsWindow instance;
