@@ -172,6 +172,24 @@ namespace Morchul.CodeManager
 
         #region WRITE methods
         /// <summary>
+        /// Sets the whole code. Works only for InspectionType Text, not for file. The purpose is to reuse the CodeInspection instance for text strings.
+        /// </summary>
+        /// <param name="newCode">The new Text</param>
+        /// <returns>True if InspectionType is Text else false</returns>
+        public bool SetEverything(string newCode)
+        {
+            if(Type == InspectionType.FILE)
+            {
+                Debug.LogError("SetEverything only works for inspection of Texts to reuse the same instance of CodeInspection. For File you have GetEverything change the Code and Commit.");
+                return false;
+            }
+
+            ResetCodeInspection();
+            CompleteCode = newCode;
+            return true;
+        }
+
+        /// <summary>
         /// Adds a codePiece as First item in the code
         /// </summary>
         /// <param name="newCodePiece">The code piece</param>

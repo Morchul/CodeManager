@@ -12,31 +12,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06d489e5fda0e7249a4f33ab5edf08a4, type: 3}
   m_Name: CodeManagerSettings
   m_EditorClassIdentifier: 
-  ScriptFolders: []
+  ScriptFolders:
+  - Name: Defaultfolder
+    Path: Assets/Scripts/
+    CleanCodeRules: 01000000
+    IncludeSubDirectory: 1
   Placeholders: []
   UnwantedCodes:
   - Name: Empty Codeblock
     RegexIndex: 0
     Description: No empty code blocks allowed.
-    ID: 0
+    ID: 1
   CodeGuidelines:
   - Name: Method Name
     SearchRegexIndex: 1
     GroupName: identifier
     MatchRegexIndex: 5
     Description: Methods have to start with a capital letter
-    ID: 0
+    ID: 2
   - Name: Private field name
     SearchRegexIndex: 4
     GroupName: identifier
     MatchRegexIndex: 6
     Description: private fields have to start with a lowercase letter
-    ID: 0
+    ID: 3
   CodeDocumentations:
   - Name: Documentation on class
     RegexIndex: 2
     Description: Classes must be documented
-    ID: 0
+    ID: 4
+  - Name: Lalal
+    RegexIndex: -1
+    Description: Description
+    ID: 5
   DocumentationRegex:
     Name: 
     Regex: '[^\S][\/]{2,3}.*\n?$'
@@ -55,3 +63,5 @@ MonoBehaviour:
     Regex: \b[A-Z][a-zA-Z_0-9]*
   - Name: Private field name regex
     Regex: \b[a-z][a-zA-Z_0-9]*
+  - Name: My new regex
+    Regex: \b[A-Z][a-z]*

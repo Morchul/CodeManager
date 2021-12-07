@@ -19,7 +19,7 @@ namespace Morchul.CodeManager
 
         public float LIST_ELEMENT_HEIGHT { get; private set; }
 
-        public CustomReorderableList(SerializedObject serializedObject, SerializedProperty serializedProperty, int initialLength, bool draggable = true) : base(serializedObject, serializedProperty, draggable, false, true, true)
+        public CustomReorderableList(SerializedObject serializedObject, SerializedProperty serializedProperty, int initialLength, bool draggable = true, bool displayHeader = false, bool displayAddRemoveButtons = true) : base(serializedObject, serializedProperty, draggable, displayHeader, displayAddRemoveButtons, displayAddRemoveButtons)
         {
             LIST_ELEMENT_HEIGHT = EditorGUIUtility.singleLineHeight + 5f;
             Expanded = false;

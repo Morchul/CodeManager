@@ -69,10 +69,6 @@ namespace Morchul.CodeManager
         }
 
         #region Draw
-        private void OnInspectorUpdate()
-        {
-            Repaint();
-        }
 
         private void OnGUI()
         {
@@ -116,13 +112,13 @@ namespace Morchul.CodeManager
 
             if (CodeManagerEditorUtility.IsValidFolderPath(path))
             {
-                Rect buttonRect = new Rect(0, BORDER_WIDTH + EditorGUIUtility.singleLineHeight * 5, 150, 30);
-                if (GUI.Button(buttonRect, new GUIContent("Create Script")))
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button(new GUIContent("Create Script"), GUILayout.Height(30), GUILayout.Width(130)))
                 {
                     CreateNewScript();
                 }
-                Rect informationRect = new Rect(160, buttonRect.y + 5, position.width - BORDER_WIDTH * 2, EditorGUIUtility.singleLineHeight);
-                EditorGUI.LabelField(informationRect, informationText);
+                EditorGUILayout.LabelField(informationText);
+                EditorGUILayout.EndHorizontal();
             }
             else
             {

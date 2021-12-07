@@ -668,6 +668,11 @@ namespace Morchul.CodeManager
                 serializedSettings.ApplyModifiedProperties();
             }
 
+            if(GUILayout.Button(new GUIContent("Test Regex Window")))
+            {
+                RegexTesterWindow.ShowWindow(regexList.index);
+            }
+
             EditorGUILayout.EndVertical();
         }
 
