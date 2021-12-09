@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Linq;
 
 namespace Morchul.CodeManager
 {
@@ -20,17 +22,22 @@ namespace Morchul.CodeManager
         private const float BORDER_WIDTH = 10;
 
         private const int FONT_SIZE = 14;
-        private const int PADDING = 5;
-        private const int LINE_HEIHGT = FONT_SIZE + 3;
+
+        private const float MATCH_FIELD_WIDTH = 370;
+
+        private const float MATCH_GROUP_WIDTH = MATCH_FIELD_WIDTH - 10;
+
+        private const float MAX_MATCH_GROUP_HEIGHT = 100;
 
         private CodeManagerSettings settings;
 
-        private string regex;
-        private string text;
-        private RegexOptions regexOptions;
+        private GUIStyle boldLabelStyle;
+        private GUIStyle regexAreaStyle;
+        private GUIStyle textAreaStyle;
 
-        private Color textColor = Color.white;
-        private Color highlightColor = new Color(153f/255f, 81f/255f, 26f/255f, 0.5f);
+        private string regex;
+        private string richText;
+        private RegexOptions regexOptions;
 
         private Vector2 scrollPos;
         private Vector2 scrollPos2;
@@ -41,7 +48,13 @@ namespace Morchul.CodeManager
 
         private RegexTesterMatches regexMatches;
 
-        private RegexTesterMatch currentSelectedMatch;
+        private CustomReorderableList matchesList;
+
+        private SerializedObject serializedMatches;
+
+        private Vector2[] elementGroupListScrollPos;
+
+        private readonly string[] colorArray = new string[] { "#FF00FFFF", "#0000FFFF", "#ffa500ff", "#008000ff", "#800080ff", "#008080ff" };
 
         /// <summary>
         /// Method to show the window
@@ -61,17 +74,25 @@ namespace Morchul.CodeManager
 
         private void OnEnable()
         {
-            currentSelectedMatch = RegexTesterMatch.Null;
-
             settings = CodeManagerEditorUtility.LoadSettings();
             SelectRegex(selectedRegexIndex);
 
             regexMatches = ScriptableObject.CreateInstance<RegexTesterMatches>();
 
+            serializedMatches = new SerializedObject(regexMatches);
+            
+            if(boldLabelStyle == null)
+            {
+                boldLabelStyle = new GUIStyle("Label")
+                {
+                    fontStyle = FontStyle.Bold,
+                };
+            }
+
             if(codeInspection == null)
             {
-                text = "";
-                codeInspection = CodeInspector.InspectText(text);
+                richText = "";
+                codeInspection = CodeInspector.InspectText(richText);
             }
         }
 
@@ -98,6 +119,89 @@ namespace Morchul.CodeManager
             }
         }
 
+        #region List Creation
+        private void CreateMatchesList()
+        {
+            elementGroupListScrollPos = new Vector2[regexMatches.Matches.Length];
+
+            for(int i = 0; i < regexMatches.Matches.Length; ++i)
+            {
+                elementGroupListScrollPos[i] = Vector2.zero;
+            }
+
+            matchesList = new CustomReorderableList(serializedMatches, serializedMatches.FindProperty("Matches"), regexMatches.Matches.Length, false, false, false)
+            {
+                onElementDrawCallback = (Rect rect, int index, bool isActive, bool isFocused, CustomReorderableList list) =>
+                {
+                    SerializedProperty matchProperty = list.serializedProperty.GetArrayElementAtIndex(index);
+                    SerializedProperty matchTextProperty = matchProperty.FindPropertyRelative("MatchText");
+                    SerializedProperty matchGroupArrayProperty = matchProperty.FindPropertyRelative("MatchGroups");
+
+                    Rect foldoutRect = rect;
+                    if (list.ElementExpanded[index])
+                        foldoutRect.y -= list.ElementHeights[index] / 2 - list.LIST_ELEMENT_HEIGHT / 2;
+
+                    list.ElementExpanded[index] = EditorGUI.Foldout(foldoutRect, list.ElementExpanded[index], "Match " + (index + 1), false);
+                    if (list.ElementExpanded[index])
+                    {
+                        
+                        float matchTextHeight = list.ElementHeights[index] - MAX_MATCH_GROUP_HEIGHT - list.LIST_ELEMENT_HEIGHT * 3;
+
+                        //Add MatchText
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight), new GUIContent("Match text:", "The text which was matched by the regex."), boldLabelStyle);
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, MATCH_FIELD_WIDTH, matchTextHeight), new GUIContent(matchTextProperty.stringValue, matchTextProperty.stringValue));
+
+                        //rect.y += list.LIST_ELEMENT_HEIGHT;
+                        rect.y += matchTextHeight;
+                        EditorGUI.LabelField(new Rect(rect.x, rect.y, MATCH_GROUP_WIDTH / 2, EditorGUIUtility.singleLineHeight), new GUIContent("Group name", "The names of all groups found in this match. The coresponding value is on the left."), boldLabelStyle);
+                        EditorGUI.LabelField(new Rect(rect.x + MATCH_GROUP_WIDTH / 2, rect.y, MATCH_GROUP_WIDTH / 2, EditorGUIUtility.singleLineHeight), new GUIContent("Group value", "The values of all groups found in this match. The coresponding name is on the right."), boldLabelStyle);
+
+                        //Add Groups
+                        rect.y += list.LIST_ELEMENT_HEIGHT;
+                        float groupHeight = list.LIST_ELEMENT_HEIGHT * matchGroupArrayProperty.arraySize;
+                        Rect viewRect = new Rect(rect.x, rect.y, MATCH_GROUP_WIDTH, groupHeight);
+
+                        elementGroupListScrollPos[index] = GUI.BeginScrollView(new Rect(rect.x, rect.y, MATCH_GROUP_WIDTH, MAX_MATCH_GROUP_HEIGHT), elementGroupListScrollPos[index], viewRect, false, false);
+
+                        for (int i = 0; i < matchGroupArrayProperty.arraySize; ++i)
+                        {
+                            //rect.y += list.LIST_ELEMENT_HEIGHT;
+                            SerializedProperty groupProperty = matchGroupArrayProperty.GetArrayElementAtIndex(i);
+                            SerializedProperty groupNameProperty = groupProperty.FindPropertyRelative("Name");
+                            SerializedProperty groupValueProperty = groupProperty.FindPropertyRelative("Value");
+
+                            EditorGUI.LabelField(new Rect(rect.x, rect.y, MATCH_GROUP_WIDTH / 2, list.LIST_ELEMENT_HEIGHT), new GUIContent(groupNameProperty.stringValue, groupNameProperty.stringValue));
+                            EditorGUI.LabelField(new Rect(rect.x + MATCH_GROUP_WIDTH / 2, rect.y, MATCH_GROUP_WIDTH / 2, list.LIST_ELEMENT_HEIGHT), new GUIContent(groupValueProperty.stringValue, groupValueProperty.stringValue));
+                            rect.y += list.LIST_ELEMENT_HEIGHT;
+                        }
+
+                        GUI.EndScrollView();
+                    }
+                },
+
+                onElementHeightCallback = (int index, CustomReorderableList list) =>
+                {
+                    if (list.ElementExpanded[index])
+                    {
+                        SerializedProperty match = list.serializedProperty.GetArrayElementAtIndex(index);
+                        SerializedProperty matchProperty = match.FindPropertyRelative("MatchText");
+
+                        CodeManagerUtility.GetLineCount(matchProperty.stringValue, out int lineCount);
+                        float matchTextHeight = lineCount * EditorGUIUtility.singleLineHeight;
+                        list.ElementHeights[index] = matchTextHeight + MAX_MATCH_GROUP_HEIGHT + list.LIST_ELEMENT_HEIGHT * 3;
+                    }
+                    else
+                    {
+                        list.ElementHeights[index] = list.LIST_ELEMENT_HEIGHT;
+                    }
+                    return list.ElementHeights[index];
+                }
+            };
+        }
+        #endregion
+
         #region Regex Matches
 
         #region class and structs
@@ -109,20 +213,8 @@ namespace Morchul.CodeManager
         [System.Serializable]
         private struct RegexTesterMatch
         {
-
-            public static RegexTesterMatch Null;
-
             public string MatchText;
-
-            public int LineIndex;
-            public float LinePosIndex;
-
             public RegexTesterGroup[] MatchGroups;
-
-            public bool IsNull()
-            {
-                return string.IsNullOrEmpty(MatchText);
-            }
         }
 
         [System.Serializable]
@@ -132,19 +224,6 @@ namespace Morchul.CodeManager
             public string Value;
         }
         #endregion
-
-        private void Search()
-        {
-            if (string.IsNullOrEmpty(text)) return;
-
-            codeInspection.SetEverything(text);
-            codeInspection.Settings = GetCodeInspectionSettings();
-
-            if(codeInspection.FindAll(regex, out LinkedListNode<CodePiece>[] codePieces))
-            {
-                regexMatches.Matches = GetMatches(codePieces);
-            }
-        }
 
         private CodeInspectionSettings GetCodeInspectionSettings()
         {
@@ -178,62 +257,107 @@ namespace Morchul.CodeManager
                 matchGroups.Add(new RegexTesterGroup() { Name = group.Name, Value = group.Value });
             }
 
-            float LinePosIndex = 0;
-
-            LinkedListNode<CodePiece> previous = codePiece.Previous;
-            while (previous != null)
-            {
-                string previousCode = previous.Value.Code;
-                int indexOfLastNewLine = previousCode.LastIndexOf("\n");
-                string temp;
-                if (indexOfLastNewLine >= 0)
-                {
-                    temp = previousCode.Substring(indexOfLastNewLine);                    
-                    LinePosIndex += CodeManagerEditorUtility.CalcTextWidth(temp, GUI.skin.font, FONT_SIZE);
-                    break;
-                }
-                else
-                {
-                    temp = previousCode;
-                    LinePosIndex += CodeManagerEditorUtility.CalcTextWidth(temp, GUI.skin.font, FONT_SIZE);
-                }
-                previous = previous.Previous;
-
-            }
-
             return new RegexTesterMatch()
             {
                 MatchText = codePiece.Value.Code,
-                LineIndex = codeInspection.GetLineIndex(codePiece),
-                LinePosIndex = LinePosIndex,
                 MatchGroups = matchGroups.ToArray()
             };
         }
         #endregion
 
-        private GUIStyle GetTextAreaStyle()
+        private void Search()
         {
-            GUIStyle style = new GUIStyle
+            if (string.IsNullOrEmpty(richText))
             {
-                imagePosition = ImagePosition.TextOnly,
-                padding = new RectOffset(PADDING, PADDING, PADDING, PADDING),
-                fontSize = FONT_SIZE,
-            };
-            style.normal.background = null;
-            style.normal.textColor = textColor;
-            style.active.background = null;
-            style.active.textColor = textColor;
-            style.hover.background = null;
-            style.hover.textColor = textColor;
-            style.focused.background = null;
-            style.focused.textColor = textColor;
-            return style;
+                regexMatches.Matches = new RegexTesterMatch[0];
+                return;
+            }
+
+            codeInspection.SetEverything(CreatePlainText(richText));
+            codeInspection.Settings = GetCodeInspectionSettings();
+
+            if (codeInspection.FindAll(regex, out LinkedListNode<CodePiece>[] codePieces))
+            {
+                regexMatches.Matches = GetMatches(codePieces);
+                richText = CreateRichText(codePieces);
+                CreateMatchesList();
+            }
+            else
+            {
+                regexMatches.Matches = new RegexTesterMatch[0];
+            }
+        }
+
+        private string CreatePlainText(string richText)
+        {
+            return Regex.Replace(richText, @"\<\/?color(\>|=#[A-Fa-f0-9]{8}\>)", "");
+        }
+
+        private string CreateRichText(LinkedListNode<CodePiece>[] codePieces)
+        {
+            LinkedListNode<CodePiece> next = codeInspection.First;
+            if (next == null) return richText;
+
+            StringBuilder sb = new StringBuilder();
+            
+            while(next != null)
+            {
+                if (codePieces.Contains(next))
+                {
+                    int colorCounter = -1;
+                    string text = next.Value.Code;
+                    foreach(Group group in next.Value.Match.Groups)
+                    {
+                        if (string.IsNullOrEmpty(group.Value)) continue;
+
+                        if (text.Contains(group.Value))
+                        {
+                            string newText = "<color=" + colorArray[++colorCounter] + ">" + group.Value + "</color>";
+                            text = text.Replace(group.Value, newText);
+                        }
+
+                        if(colorCounter == colorArray.Length - 1) colorCounter = -1;
+                    }
+                    sb.Append(text);
+                }
+                else
+                {
+                    sb.Append(next.Value.Code);
+                }
+
+                next = next.Next;
+            }
+
+            return sb.ToString();
+        }
+
+        private void CreateStyles()
+        {
+            if (regexAreaStyle == null)
+            {
+                regexAreaStyle = new GUIStyle("TextArea")
+                {
+                    wordWrap = true,
+                };
+            }
+
+            if (textAreaStyle == null)
+            {
+                textAreaStyle = new GUIStyle("TextArea")
+                {
+                    fontSize = FONT_SIZE,
+                    richText = true,
+                    wordWrap = true,
+                };
+
+                textAreaStyle.normal.textColor = Color.white;
+            }
         }
 
         #region Draw
         private void OnGUI()
         {
-
+            CreateStyles();
             GUILayout.BeginArea(new Rect(BORDER_WIDTH, BORDER_WIDTH, position.width - BORDER_WIDTH * 2, position.height - BORDER_WIDTH * 2));
 
             EditorGUILayout.BeginHorizontal();
@@ -247,10 +371,10 @@ namespace Morchul.CodeManager
 
             EditorGUILayout.BeginVertical(); //Left side
 
-            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Regex", GUILayout.Width(50));
-            regex = EditorGUILayout.TextField(regex);
-            EditorGUILayout.EndHorizontal();
+
+            string previousRegex = regex;
+            regex = EditorGUILayout.TextArea(regex, regexAreaStyle);
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Regex options", GUILayout.Width(100));
@@ -264,24 +388,14 @@ namespace Morchul.CodeManager
 
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-            EditorGUILayout.BeginVertical("TextArea");
+            string previousText = richText;
+            richText = EditorGUILayout.TextArea(richText, textAreaStyle, GUILayout.ExpandHeight(true));
 
-            RegexTesterMatch selectedMatch = DrawMatches();
-            if(!selectedMatch.IsNull())
+            //Only check the length for performance improvement
+            if (previousText.Length != richText.Length || previousRegex.Length != regex.Length)
             {
-                currentSelectedMatch = selectedMatch;
+                Search();
             }
-
-            string previousText = text;
-            text = EditorGUILayout.TextArea(text, GetTextAreaStyle(), GUILayout.ExpandHeight(true));
-
-            //Only check for length for performance improvement
-            if(previousText.Length != text.Length)
-            {
-                regexMatches.Matches = null;
-            }
-
-            EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.EndVertical();
@@ -289,32 +403,20 @@ namespace Morchul.CodeManager
             if (preventSelection)
                 GUI.skin.settings.cursorColor = oldCursorColor;
 
-            if (!currentSelectedMatch.IsNull())
+            if (matchesList != null && regexMatches.Matches.Length > 0)
             {
 
-                EditorGUILayout.BeginVertical(GUILayout.MaxWidth(300)); //right side
+                EditorGUILayout.BeginVertical(GUILayout.Width(MATCH_FIELD_WIDTH)); //right side
                 scrollPos2 = EditorGUILayout.BeginScrollView(scrollPos2);
 
-                EditorGUILayout.LabelField("Match Text:");
-                EditorGUILayout.LabelField(currentSelectedMatch.MatchText);
-                EditorGUILayout.LabelField("Line Index:");
-                EditorGUILayout.LabelField(currentSelectedMatch.LineIndex.ToString());
-
-                if (currentSelectedMatch.MatchGroups.Length > 0)
+                matchesList.Expanded = EditorGUILayout.Foldout(matchesList.Expanded, "Matches");
+                if (matchesList.Expanded)
                 {
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Group name", GUILayout.MaxWidth(200));
-                    EditorGUILayout.LabelField("Value", GUILayout.MaxWidth(200));
-                    EditorGUILayout.EndHorizontal();
-                    //Match Groups
-                    foreach (RegexTesterGroup group in currentSelectedMatch.MatchGroups)
-                    {
-                        EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField(group.Name, GUILayout.MaxWidth(200));
-                        EditorGUILayout.LabelField(group.Value, GUILayout.MaxWidth(200));
-                        EditorGUILayout.EndHorizontal();
-                    }
+                    serializedMatches.Update();
+                    matchesList.DoLayoutList();
+                    serializedMatches.ApplyModifiedProperties();
                 }
+
                 EditorGUILayout.EndScrollView();
                 EditorGUILayout.EndVertical();
             }
@@ -322,28 +424,6 @@ namespace Morchul.CodeManager
             EditorGUILayout.EndHorizontal();
 
             GUILayout.EndArea();
-        }
-
-        private RegexTesterMatch DrawMatches()
-        {
-            if (regexMatches.Matches == null || regexMatches.Matches.Length == 0) return RegexTesterMatch.Null;
-
-            foreach(RegexTesterMatch match in regexMatches.Matches)
-            {
-                Vector2 size = new Vector2(CodeManagerEditorUtility.CalcTextWidth(match.MatchText, GUI.skin.font, FONT_SIZE), FONT_SIZE);
-                Rect rect = new Rect(match.LinePosIndex + (PADDING * 2), LINE_HEIHGT * (match.LineIndex - 1) + PADDING * 2, size.x, size.y);
-                EditorGUI.DrawRect(rect, highlightColor);
-
-                if(Event.current.type == EventType.MouseUp)
-                {
-                    if (rect.Contains(Event.current.mousePosition))
-                    {
-                        return match;
-                    }
-                }
-            }
-
-            return RegexTesterMatch.Null;
         }
         #endregion
     }

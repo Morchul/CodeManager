@@ -15,10 +15,20 @@ namespace Morchul.CodeManager
     /// </summary>
     public class CodeInspection
     {
+        /// <summary>
+        /// Insepction mode of CodeInspection
+        /// </summary>
         public InspectionMode Mode { get; private set; }
+        /// <summary>
+        /// Inspection type of CodeInspection
+        /// </summary>
         public InspectionType Type { get; private set; }
 
         private CodeInspectionSettings settings;
+        /// <summary>
+        /// Currently used CodeInspectionSettings.
+        /// Can be changed (Commit may be necessary before changing)
+        /// </summary>
         public CodeInspectionSettings Settings
         {
             get => settings;
@@ -31,19 +41,36 @@ namespace Morchul.CodeManager
             }
         }
 
-
+        /// <summary>
+        /// Path to the file. Empty if Type is Text
+        /// </summary>
         public string Path { get; private set; }
+        /// <summary>
+        /// Name of the File. Empty if Type is Text
+        /// </summary>
         public string FileName { get; private set; }
 
+        /// <summary>
+        /// The Complete Code
+        /// </summary>
         public string CompleteCode { get; private set; }
 
+        /// <summary>
+        /// CodeInspectionID if Type is File and CodeInspectionID is 0 the CodeInspection is inactive
+        /// </summary>
         public uint CodeInspectionID { get; private set; }
 
         private bool editationActive = false;
 
         private readonly LinkedList<CodePiece> codePiecesList;
 
+        /// <summary>
+        /// First element of CodePieces list (can be null)
+        /// </summary>
         public LinkedListNode<CodePiece> First => codePiecesList.First;
+        /// <summary>
+        /// Last element of CodePieces list (can be null)
+        /// </summary>
         public LinkedListNode<CodePiece> Last => codePiecesList.Last;
 
         internal CodeInspection(uint codeInspectionID, InspectionMode mode, InspectionType type, string pathOrText)

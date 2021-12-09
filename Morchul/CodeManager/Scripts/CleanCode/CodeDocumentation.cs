@@ -7,11 +7,24 @@ namespace Morchul.CodeManager
     [System.Serializable]
     public struct CodeDocumentation : ICleanCodeRule
     {
+        /// <summary>
+        /// The name of the CodeDocumentation Rule
+        /// </summary>
         public string Name;
+
+        /// <summary>
+        /// The Index of the Regex in the settings which is used by the CodeDocumentation rule
+        /// </summary>
         public int RegexIndex;
 
+        /// <summary>
+        /// CodeDocumentation rule description
+        /// </summary>
         public string Description;
 
+        /// <summary>
+        /// identifier of the CodeDocumentation rule
+        /// </summary>
         public uint ID;
 
         public uint GetID()
@@ -24,6 +37,10 @@ namespace Morchul.CodeManager
             return Name;
         }
 
+        /// <summary>
+        /// Valid if Regex is set
+        /// </summary>
+        /// <returns>True if CodeDocumentation rule is valid</returns>
         public bool IsValid()
         {
             return RegexIndex >= 0;

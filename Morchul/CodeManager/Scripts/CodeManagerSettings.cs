@@ -43,6 +43,11 @@ namespace Morchul.CodeManager
             }
         }
 
+        /// <summary>
+        /// Adds a ready listener. When the settings are loaded the onReadyAction will be executed.
+        /// Will also be executed if the settings have already been loaded
+        /// </summary>
+        /// <param name="onReadyAction">The action which will be executed when the settings are loaded</param>
         public void AddReadyListener(System.Action onReadyAction)
         {
             if (CleanCodeRules == null)
@@ -56,12 +61,6 @@ namespace Morchul.CodeManager
         }
 
         #region CleanCode methods
-        private void AddICleanCodeRule(ICleanCodeRule rules)
-        {
-            if (rules.IsValid())
-                CleanCodeRules.Add(rules.GetID(), rules);
-        }
-
         /// <summary>
         /// Update the CleanCodeRules Dictionary (UnwantedCode, CodeGuideline, CodeDocumentation)
         /// </summary>
@@ -96,6 +95,12 @@ namespace Morchul.CodeManager
                 }
                 AddICleanCodeRule(CodeDocumentations[i]);
             }
+        }
+
+        private void AddICleanCodeRule(ICleanCodeRule rules)
+        {
+            if (rules.IsValid())
+                CleanCodeRules.Add(rules.GetID(), rules);
         }
         #endregion
     }

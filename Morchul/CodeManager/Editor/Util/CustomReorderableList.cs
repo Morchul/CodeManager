@@ -38,6 +38,15 @@ namespace Morchul.CodeManager
             onReorderCallbackWithDetails = ReorderItem;
         }
 
+        public void Update()
+        {
+            ElementExpanded.Clear();
+            ElementHeights.Clear();
+            Debug.Log("Update: " + this.serializedProperty.arraySize);
+            for (int i = 0; i < this.serializedProperty.arraySize; ++i)
+                UpdateReorderableStatusLists_Add();
+        }
+
         private void UpdateReorderableStatusLists_Update(int oldIndex, int newIndex)
         {
             bool oldExpandValue = ElementExpanded[oldIndex];

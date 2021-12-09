@@ -1,4 +1,3 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Morchul.CodeManager
@@ -12,8 +11,6 @@ namespace Morchul.CodeManager
         public const string CodeManagerPath = "Assets/Plugins/Morchul/CodeManager/";
         public const string CodeManagerResourcePath = CodeManagerPath + "Resources/";
         public const string ScriptTemplatePath = ScriptTemplateFolderPath + "/";
-        //public const string ScriptTemplateSettingsObject = CodeManagerResourcePath + "ScriptTemplateSettings.asset";
-        //public const string CleanCodeSettingsObject = CodeManagerResourcePath + "CleanCodeSettings.asset";
         public const string CodeManagerSettingsObject = CodeManagerResourcePath + "CodeManagerSettings.asset";
 
         public const string ScriptTemplateFolder = "ScriptTemplates";
@@ -21,6 +18,11 @@ namespace Morchul.CodeManager
         public const string ScriptTemplateFolderPath = "Assets/" + ScriptTemplateFolder;
         #endregion
 
+        /// <summary>
+        /// Converts a path to a operating system Path (Removes the / at the end of the path)
+        /// </summary>
+        /// <param name="str">The path used in CodeManager</param>
+        /// <returns>returns the path without / at the end</returns>
         public static string ConvertToOpertingSystemPath(string str)
         {
             if (str[str.Length - 1] == '/')

@@ -21,6 +21,11 @@ namespace Morchul.CodeManager
         public const string DocumentationImagePath = CodeManagerUtility.CodeManagerResourcePath + "CodeDocumentationImage.png";
         #endregion
 
+        /// <summary>
+        /// Loads the current CodemanagerSettings.
+        /// </summary>
+        /// <param name="createNewIfNotExist">If set to true new CodeManagerSettings will be created if they do not exist. If false the return value can be null</param>
+        /// <returns>The loaded CodeManagerSettings (can be null if not found and createNewIfNotExist is false)</returns>
         public static CodeManagerSettings LoadSettings(bool createNewIfNotExist = false)
         {
             if (instance == null)
@@ -41,7 +46,7 @@ namespace Morchul.CodeManager
         /// Tests if path points to a folder under Assets which already exists
         /// </summary>
         /// <param name="path">The path to folder</param>
-        /// <returns>True if the folder is under Assets and exists</returns>
+        /// <returns>True if the folder is under Assets, exists and ends with /</returns>
         public static bool IsValidAssetsFolderPath(string path)
         {
             if(Regex.IsMatch(path, @"^Assets/.*/$"))
@@ -51,6 +56,11 @@ namespace Morchul.CodeManager
             return false;
         }
 
+        /// <summary>
+        /// Tests if path points to a valid folder and ends with /
+        /// </summary>
+        /// <param name="path">The path to folder</param>
+        /// <returns>True if the folder exists and ends with /</returns>
         public static bool IsValidFolderPath(string path)
         {
             if (Regex.IsMatch(path, @"/$"))
@@ -103,32 +113,6 @@ namespace Morchul.CodeManager
                 return defaultPath;
             }
         }
-
-        /// <summary>
-        /// Calculates the Width of a text in pixel.
-        /// </summary>
-        /// <param name="text">The text which width should be calculated</param>
-        /// <param name="font">The font used by the text</param>
-        /// <param name="fontSize">The fontsize of the text</param>
-        /// <param name="fontstyle">The fontstyle of the text default = Normal</param>
-        /// <returns></returns>
-        public static int CalcTextWidth(string text, Font font, int fontSize, FontStyle fontstyle = FontStyle.Normal)
-        {
-            if (string.IsNullOrEmpty(text))
-                return 0;
-
-            int w = 0;
-            font.RequestCharactersInTexture(text, fontSize, fontstyle);
-
-            foreach (char c in text)
-            {
-                font.GetCharacterInfo(c, out CharacterInfo cInfo, fontSize);
-                w += cInfo.advance;
-            }
-
-            return w;
-        }
-
     }
 }
 

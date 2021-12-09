@@ -8,9 +8,21 @@ namespace Morchul.CodeManager
     /// </summary>
     public class CleanCodeViolation
     {
+        /// <summary>
+        /// The script where the CleanCodeViolation occured
+        /// </summary>
         public readonly Object Script;
+        /// <summary>
+        /// The line index where the CleanCodeViolation occured
+        /// </summary>
         public readonly int LineIndex;
+        /// <summary>
+        /// The description of the rule which was violated
+        /// </summary>
         public readonly string Description;
+        /// <summary>
+        /// The description of the CleanCodeViolation
+        /// </summary>
         public readonly string ErrorMessage;
 
         public readonly Texture2D Image;

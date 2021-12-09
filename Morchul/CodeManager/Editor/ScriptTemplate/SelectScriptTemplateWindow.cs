@@ -28,6 +28,8 @@ namespace Morchul.CodeManager
 
         private int selectedScriptTemplateIndex;
 
+        private GUIStyle scriptTemplateButtonStyle;
+
         private string path;
 
         /// <summary>
@@ -73,8 +75,6 @@ namespace Morchul.CodeManager
         private void OnEnable()
         {
             scriptTemplates = LoadScriptTemplates();
-
-            //scriptTemplateImage = AssetDatabase.LoadAssetAtPath<Texture2D>(CodeManagerEditorUtility.ScriptTemplateImage);
         }
 
         private GUIContent[] GetScriptTemplateGUIContents()
@@ -89,10 +89,6 @@ namespace Morchul.CodeManager
         }
 
         #region Draw
-        /*private void OnInspectorUpdate()
-        {
-            Repaint();
-        }*/
 
         private void OnGUI()
         {
@@ -102,6 +98,8 @@ namespace Morchul.CodeManager
                 return;
             }
 
+            CreateGUIStyles();
+
             int amountOfBoxesInX = (int)((position.width - BORDER_WIDTH * 2) / SCRIPT_TEMPLATE_BOX_WIDTH);
             amountOfBoxesInX = Mathf.Max(1, Mathf.Min(amountOfBoxesInX, scriptTemplates.Length));
 
@@ -110,7 +108,7 @@ namespace Morchul.CodeManager
 
             GUIContent[] guiContents = GetScriptTemplateGUIContents();
             if(guiContents.Length > 0)
-                selectedScriptTemplateIndex = GUILayout.SelectionGrid(-1, guiContents, amountOfBoxesInX, GetScriptTemplateButtonGUIStyle());
+                selectedScriptTemplateIndex = GUILayout.SelectionGrid(-1, guiContents, amountOfBoxesInX, scriptTemplateButtonStyle);
 
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
@@ -128,14 +126,15 @@ namespace Morchul.CodeManager
             }
         }
 
-        private GUIStyle GetScriptTemplateButtonGUIStyle()
+        private void CreateGUIStyles()
         {
-            GUIStyle style = new GUIStyle(GUI.skin.button);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.imagePosition = ImagePosition.ImageAbove;
-            style.stretchWidth = true;
-            style.fixedHeight = SCRIPT_TEMPLATE_BOX_HEIGHT;
-            return style;
+            scriptTemplateButtonStyle = new GUIStyle(GUI.skin.button)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                imagePosition = ImagePosition.ImageAbove,
+                stretchWidth = true,
+                fixedHeight = SCRIPT_TEMPLATE_BOX_HEIGHT
+            };
         }
         #endregion
     }
