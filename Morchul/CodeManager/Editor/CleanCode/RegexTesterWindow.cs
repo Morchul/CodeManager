@@ -272,8 +272,8 @@ namespace Morchul.CodeManager
                 regexMatches.Matches = new RegexTesterMatch[0];
                 return;
             }
-
-            codeInspection.SetEverything(CreatePlainText(richText));
+            string plainText = CreatePlainText(richText);
+            codeInspection.SetEverything(plainText);
             codeInspection.Settings = GetCodeInspectionSettings();
 
             if (codeInspection.FindAll(regex, out LinkedListNode<CodePiece>[] codePieces))
@@ -285,6 +285,7 @@ namespace Morchul.CodeManager
             else
             {
                 regexMatches.Matches = new RegexTesterMatch[0];
+                richText = plainText;
             }
         }
 
