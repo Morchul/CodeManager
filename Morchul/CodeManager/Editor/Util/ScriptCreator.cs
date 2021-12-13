@@ -13,7 +13,7 @@ namespace Morchul.CodeManager
     /// </summary>
     public static class ScriptCreator
     {
-        private readonly static string[] defaultPlaceholders = new string[] { "ScriptName" };
+        private readonly static string[] defaultPlaceholders = new string[] { "ScriptName", "TemplateName" };
 
         /// <summary>
         /// Tests if the placeholderName is in the defaultPlaceholders
@@ -89,7 +89,7 @@ namespace Morchul.CodeManager
 
                 if (foundPlaceholders.Length > 0)
                 {
-                    if (!LoadPlaceholderValues(out Placeholder[] placeholderValues, scriptName))
+                    if (!LoadPlaceholderValues(out Placeholder[] placeholderValues, scriptName, scriptTemplate.TemplateName))
                     {
                         Debug.LogError("Can't create script. See Error message above.");
                         return;

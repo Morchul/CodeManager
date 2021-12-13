@@ -58,10 +58,10 @@ MonoBehaviour:
   - Name: Field regex
     Regex: \b(public\s*|private\s*|protected\s*|internal\s*)?\b(static\s*|virtual\s*|abstract\s*|readonly\s*|const\s*)?\b([A-Za-z0-9_\[\]\<\>]+)\s*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)
   - Name: Private Field regex
-    Regex: \b(private\s*)\b(static\s*|virtual\s*|abstract\s*|readonly\s*|const\s*)?\b([A-Za-z0-9_\[\]\<\>]+)\s*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)
+    Regex: \b(private\s*)\b(static\s*|virtual\s*|abstract\s*|readonly\s*|const\s*)?\b([A-Za-z0-9_\[\]\<\>]+)\s*\b(?<identifier>[A-Za-z_][A-Za-z_0-9]*)(;|\s*=\s*[a-zA-Z0-9_])
   - Name: Method Name regex
     Regex: \b[A-Z][a-zA-Z_0-9]*
   - Name: Private field name regex
     Regex: \b[a-z][a-zA-Z_0-9]*
   - Name: My new regex
-    Regex: \b[A-Z][a-z]*
+    Regex: \b[A-Z][a-z0-9]*

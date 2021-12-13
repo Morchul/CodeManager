@@ -36,11 +36,16 @@ namespace Morchul.CodeManager
         private GUIStyle textAreaStyle;
 
         private string regex;
-        private string richText;
+        private string text;
         private RegexOptions regexOptions;
+
+        private bool autoSearch;
+        private bool searched;
 
         private Vector2 scrollPos;
         private Vector2 scrollPos2;
+
+        private LinkedListNode<CodePiece>[] currentFoundCodePieces;
 
         private CodeInspection codeInspection;
 
@@ -74,6 +79,8 @@ namespace Morchul.CodeManager
 
         private void OnEnable()
         {
+            autoSearch = true;
+            searched = false;
             settings = CodeManagerEditorUtility.LoadSettings();
             SelectRegex(selectedRegexIndex);
 
@@ -91,8 +98,8 @@ namespace Morchul.CodeManager
 
             if(codeInspection == null)
             {
-                richText = "";
-                codeInspection = CodeInspector.InspectText(richText);
+                text = "";
+                codeInspection = CodeInspector.InspectText(text);
             }
         }
 
@@ -267,43 +274,37 @@ namespace Morchul.CodeManager
 
         private void Search()
         {
-            if (string.IsNullOrEmpty(richText))
+            if (string.IsNullOrEmpty(text) || !CodeManagerUtility.IsValidRegex(regex))
             {
                 regexMatches.Matches = new RegexTesterMatch[0];
                 return;
             }
-            string plainText = CreatePlainText(richText);
-            codeInspection.SetEverything(plainText);
+
+            codeInspection.SetEverything(text);
             codeInspection.Settings = GetCodeInspectionSettings();
 
-            if (codeInspection.FindAll(regex, out LinkedListNode<CodePiece>[] codePieces))
+            if (codeInspection.FindAll(regex, out currentFoundCodePieces))
             {
-                regexMatches.Matches = GetMatches(codePieces);
-                richText = CreateRichText(codePieces);
+                searched = true;
+                regexMatches.Matches = GetMatches(currentFoundCodePieces);
                 CreateMatchesList();
             }
             else
             {
                 regexMatches.Matches = new RegexTesterMatch[0];
-                richText = plainText;
             }
         }
 
-        private string CreatePlainText(string richText)
-        {
-            return Regex.Replace(richText, @"\<\/?color(\>|=#[A-Fa-f0-9]{8}\>)", "");
-        }
-
-        private string CreateRichText(LinkedListNode<CodePiece>[] codePieces)
+        private string CreateRichText()
         {
             LinkedListNode<CodePiece> next = codeInspection.First;
-            if (next == null) return richText;
+            if (next == null) return text;
 
             StringBuilder sb = new StringBuilder();
             
             while(next != null)
             {
-                if (codePieces.Contains(next))
+                if (currentFoundCodePieces.Contains(next))
                 {
                     int colorCounter = -1;
                     string text = next.Value.Code;
@@ -359,14 +360,13 @@ namespace Morchul.CodeManager
         private void OnGUI()
         {
             CreateStyles();
+
             GUILayout.BeginArea(new Rect(BORDER_WIDTH, BORDER_WIDTH, position.width - BORDER_WIDTH * 2, position.height - BORDER_WIDTH * 2));
 
             EditorGUILayout.BeginHorizontal();
 
             bool preventSelection = (Event.current.type == EventType.MouseDown);
-
             Color oldCursorColor = GUI.skin.settings.cursorColor;
-
             if (preventSelection)
                 GUI.skin.settings.cursorColor = new Color(0, 0, 0, 0);
 
@@ -382,21 +382,35 @@ namespace Morchul.CodeManager
             regexOptions = (RegexOptions)EditorGUILayout.EnumFlagsField(regexOptions);
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Search"))
             {
                 Search();
             }
+            EditorGUILayout.LabelField(new GUIContent("Auto search", "If this is active a search will be started automatically if the regex or text changes. Turn off for performance improvement"), GUILayout.Width(100));
+            autoSearch = EditorGUILayout.Toggle(autoSearch, GUILayout.Width(50));
+            EditorGUILayout.EndHorizontal();
 
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-            string previousText = richText;
-            richText = EditorGUILayout.TextArea(richText, textAreaStyle, GUILayout.ExpandHeight(true));
+            string previousText = text;
+            text = EditorGUILayout.TextArea(text, textAreaStyle, GUILayout.ExpandHeight(true));
 
-            //Only check the length for performance improvement
-            if (previousText.Length != richText.Length || previousRegex.Length != regex.Length)
+            if (searched)
             {
-                Search();
+                Rect rect = GUILayoutUtility.GetLastRect();//get the text area position
+                EditorGUI.TextArea(rect, CreateRichText(), textAreaStyle);//Rich text
             }
+
+            //Check for changes
+            //Only check the length for performance improvement
+            if (previousText.Length != text.Length || previousRegex.Length != regex.Length)
+            {
+                searched = false;
+                if (autoSearch)
+                    Search();
+            }
+
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.EndVertical();

@@ -4,17 +4,76 @@ using UnityEngine;
 
 public class CodeInspectorExamples : MonoBehaviour
 {
+
+    private string filePath;
     private void Start()
     {
-        //FirstExample();
+        filePath = Application.dataPath + "/Plugins/Morchul/CodeManager/Examples/ExampleFile.txt";
+        //SimpleExample();
         //ReplaceExample();
         //FileExample();
-        SettingsExample();
+        //SettingsExample();
+        //FindNamesExample();
+    }
+
+    private void FindNamesExample()
+    {
+        string text = "Dear Steve, dear Elsa,\nI hope you are fine...";
+        
+        //Create an object to inspect the text
+        CodeInspection textInspection = CodeInspector.InspectText(text);
+
+        ///------first approach-----
+        //All names are after the word dear so search for it
+        if (textInspection.FindAll(@"[Dd]ear ", out LinkedListNode<CodePiece>[] codePieces1))
+        {
+            foreach (LinkedListNode<CodePiece> codePiece in codePieces1)
+            {
+                //output the name
+                Debug.Log("Name: " + codePiece.Next.Value.Code.Substring(0, codePiece.Next.Value.Code.IndexOf(",")));
+            }
+        }
+        else
+        {
+            Debug.Log("Nothing found.");
+        }
+
+
+        ///------second approach-----
+        if (textInspection.FindAll(@"[Dd]ear (?<name>\b[A-Za-z]*)", out LinkedListNode<CodePiece>[] codePieces2))
+        {
+            foreach (LinkedListNode<CodePiece> codePiece in codePieces2)
+            {
+                //output the name found as group "name"
+                Debug.Log("Name: " + codePiece.Next.Value.Match.Groups["name"].Value);
+            }
+        }
+        else
+        {
+            Debug.Log("Nothing found.");
+        }
     }
 
     private void SettingsExample()
     {
-        //TODO
+        CodeInspection fileInspection = CodeInspector.InspectFile(filePath, InspectionMode.READ);
+        fileInspection.Settings = new CodeInspectionSettings()
+        {
+            AddLineIndex = true,
+            RegexOptions = System.Text.RegularExpressions.RegexOptions.IgnoreCase,
+            RegexTimeout = System.TimeSpan.Zero
+        };
+
+        //Search for the first c or C (RegexOptions.IgnoreCase)
+        if(fileInspection.Find(@"C", out LinkedListNode<CodePiece> foundCodePiece))
+        {
+            int lineIndex = fileInspection.GetLineIndex(foundCodePiece); //possible because AddLineIndex is true
+            Debug.Log("The first c occurs in line: " + lineIndex);
+        }
+        else
+        {
+            Debug.Log("No c found.");
+        }
     }
 
     private void ReplaceExample()
@@ -47,8 +106,7 @@ public class CodeInspectorExamples : MonoBehaviour
 
     private void FileExample()
     {
-        string path = Application.dataPath + "/Plugins/Morchul/CodeManager/Examples/ExampleFile.txt";
-        CodeInspection fileInspection = CodeInspector.InspectFile(path, InspectionMode.READ);
+        CodeInspection fileInspection = CodeInspector.InspectFile(filePath, InspectionMode.READ);
 
         Debug.Log("File name: " + fileInspection.FileName);
         //Search for words who start with a big letter and have at least 3 letters.
@@ -88,7 +146,7 @@ public class CodeInspectorExamples : MonoBehaviour
         //fileInspection.Find(".", out LinkedListNode<CodePiece> codePiece);
     }
 
-    private void FirstExample()
+    private void SimpleExample()
     {
         string text = "Hey dear Neighbours.\nHow are you";
 

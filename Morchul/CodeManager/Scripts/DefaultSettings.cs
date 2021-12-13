@@ -35,7 +35,7 @@ namespace Morchul.CodeManager
             settings.Regexes[1] = new CodeManagerRegex { Name = "Method regex", Regex = MethodRegex };
             settings.Regexes[2] = new CodeManagerRegex { Name = "Class regex", Regex = ClassRegex };
             settings.Regexes[3] = new CodeManagerRegex { Name = "Field regex", Regex = FieldRegex };
-            settings.Regexes[4] = new CodeManagerRegex { Name = "Private Field regex", Regex = AccessRegex_Private + ModifierRegex + TypeRegex + @"\s*" + IdentifierRegex };
+            settings.Regexes[4] = new CodeManagerRegex { Name = "Private Field regex", Regex = AccessRegex_Private + ModifierRegex + TypeRegex + @"\s*" + IdentifierRegex + @"(;|\s*=\s*[a-zA-Z0-9_])"};
             settings.Regexes[5] = new CodeManagerRegex { Name = "Method Name regex", Regex = @"\b[A-Z][a-zA-Z_0-9]*" };
             settings.Regexes[6] = new CodeManagerRegex { Name = "Private field name regex", Regex = @"\b[a-z][a-zA-Z_0-9]*" };
             settings.DocumentationRegex = new CodeManagerRegex() { Regex = DefaultDocumentationRegex };
