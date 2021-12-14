@@ -35,11 +35,19 @@ namespace Morchul.CodeManager
         private GUIStyle regexAreaStyle;
         private GUIStyle textAreaStyle;
 
-        private string regex;
-        private string text;
-        private RegexOptions regexOptions;
+        private Values values;
 
-        private bool autoSearch;
+        #region Regex Tester Window Values
+        [System.Serializable]
+        private class Values : ScriptableObject
+        {
+            public string regex;
+            public string text;
+            public RegexOptions regexOptions;
+            public bool autoSearch;
+        };
+        #endregion
+        
         private bool searched;
 
         private Vector2 scrollPos;
@@ -79,7 +87,9 @@ namespace Morchul.CodeManager
 
         private void OnEnable()
         {
-            autoSearch = true;
+            values = ScriptableObject.CreateInstance<Values>();
+            values.autoSearch = true;
+
             searched = false;
             settings = CodeManagerEditorUtility.LoadSettings();
             SelectRegex(selectedRegexIndex);
@@ -98,8 +108,8 @@ namespace Morchul.CodeManager
 
             if(codeInspection == null)
             {
-                text = "";
-                codeInspection = CodeInspector.InspectText(text);
+                values.text = "";
+                codeInspection = CodeInspector.InspectText(values.text);
             }
         }
 
@@ -107,7 +117,7 @@ namespace Morchul.CodeManager
         {
             if(settings != null && index >= 0 && index < settings.Regexes.Length)
             {
-                regex = settings.Regexes[index].Regex;
+                values.regex = settings.Regexes[index].Regex;
             }
         }
 
@@ -115,12 +125,12 @@ namespace Morchul.CodeManager
         {
             if (selectedRegexIndex >= 0 && selectedRegexIndex < settings.Regexes.Length)
             {
-                if (settings.Regexes[selectedRegexIndex].Regex != regex)
+                if (settings.Regexes[selectedRegexIndex].Regex != values.regex)
                 {
                     if (EditorUtility.DisplayDialog("Replace regex?", "Should the selected Regex be replaced by the new regex?", "Yes", "No"))
                     {
                         if (selectedRegexIndex < settings.Regexes.Length)
-                            settings.Regexes[selectedRegexIndex].Regex = regex;
+                            settings.Regexes[selectedRegexIndex].Regex = values.regex;
                     }
                 }
             }
@@ -238,7 +248,7 @@ namespace Morchul.CodeManager
             {
                 AddLineIndex = true,
                 RegexTimeout = System.TimeSpan.Zero,
-                RegexOptions = regexOptions
+                RegexOptions = values.regexOptions
             };
         }
 
@@ -274,16 +284,16 @@ namespace Morchul.CodeManager
 
         private void Search()
         {
-            if (string.IsNullOrEmpty(text) || !CodeManagerUtility.IsValidRegex(regex))
+            if (string.IsNullOrEmpty(values.text) || !CodeManagerUtility.IsValidRegex(values.regex))
             {
                 regexMatches.Matches = new RegexTesterMatch[0];
                 return;
             }
 
-            codeInspection.SetEverything(text);
+            codeInspection.SetEverything(values.text);
             codeInspection.Settings = GetCodeInspectionSettings();
 
-            if (codeInspection.FindAll(regex, out currentFoundCodePieces))
+            if (codeInspection.FindAll(values.regex, out currentFoundCodePieces))
             {
                 searched = true;
                 regexMatches.Matches = GetMatches(currentFoundCodePieces);
@@ -298,7 +308,7 @@ namespace Morchul.CodeManager
         private string CreateRichText()
         {
             LinkedListNode<CodePiece> next = codeInspection.First;
-            if (next == null) return text;
+            if (next == null) return values.text;
 
             StringBuilder sb = new StringBuilder();
             
@@ -374,12 +384,13 @@ namespace Morchul.CodeManager
 
             EditorGUILayout.LabelField("Regex", GUILayout.Width(50));
 
-            string previousRegex = regex;
-            regex = EditorGUILayout.TextArea(regex, regexAreaStyle);
+            EditorGUI.BeginChangeCheck();
+
+            string regexTmp = EditorGUILayout.TextArea(values.regex, regexAreaStyle);
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Regex options", GUILayout.Width(100));
-            regexOptions = (RegexOptions)EditorGUILayout.EnumFlagsField(regexOptions);
+            values.regexOptions = (RegexOptions)EditorGUILayout.EnumFlagsField(values.regexOptions);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -388,13 +399,12 @@ namespace Morchul.CodeManager
                 Search();
             }
             EditorGUILayout.LabelField(new GUIContent("Auto search", "If this is active a search will be started automatically if the regex or text changes. Turn off for performance improvement"), GUILayout.Width(100));
-            autoSearch = EditorGUILayout.Toggle(autoSearch, GUILayout.Width(50));
+            bool autoSearchTmp = EditorGUILayout.Toggle(values.autoSearch, GUILayout.Width(50));
             EditorGUILayout.EndHorizontal();
 
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-            string previousText = text;
-            text = EditorGUILayout.TextArea(text, textAreaStyle, GUILayout.ExpandHeight(true));
+            string textTmp = EditorGUILayout.TextArea(values.text, textAreaStyle, GUILayout.ExpandHeight(true));
 
             if (searched)
             {
@@ -403,11 +413,18 @@ namespace Morchul.CodeManager
             }
 
             //Check for changes
-            //Only check the length for performance improvement
-            if (previousText.Length != text.Length || previousRegex.Length != regex.Length)
+            if (EditorGUI.EndChangeCheck())
             {
+                Undo.RecordObject(values, "Test Regex Window changes");
+
+                //assign new values
+                values.text = textTmp;
+                values.regex = regexTmp;
+                values.autoSearch = autoSearchTmp;
+
+                //update search
                 searched = false;
-                if (autoSearch)
+                if (values.autoSearch)
                     Search();
             }
 
