@@ -113,6 +113,45 @@ namespace Morchul.CodeManager
                 return defaultPath;
             }
         }
+
+        #region internal
+
+        internal const int ScriptTemplatesPageNumber = 3;
+        internal const int NewScriptPageNumber = 4;
+        internal const int RegexesPageNumber = 6;
+        internal const int TestRegexWindowPageNumber = 7;
+        internal const int CleanCodeRulesPageNumber = 9;
+        internal const int CleanCodeRulesSelectionPageNumber = 16;
+        internal const int CleanCodeConsolePageNumber = 17;
+
+        /// <summary>
+        /// Shows a help dialog with a referenc to the manual and the page number
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        internal static void ShowHelpDialog(int pageNumber = 0)
+        {
+            string text = "If you need help please read the Manual in the folder: Assets/Plugins/Morchul/CodeManager/Documentation/";
+
+            if(pageNumber > 0)
+            {
+                text += " on page " + pageNumber;
+            }
+            text += ".\n\nYou can also find the API in the Documentation folder.";
+
+            EditorUtility.DisplayDialog("Help", text, "ok");
+
+            /*if (EditorUtility.DisplayDialog("Help", text, "Open Manual", "Open API"))
+            {
+                Debug.Log(CodeManagerUtility.CodeManagerManualPath);
+                Application.OpenURL(CodeManagerUtility.CodeManagerManualPath);
+            }
+            else
+            {
+                Debug.Log(CodeManagerUtility.CodeManagerAPIPath);
+                Application.OpenURL(CodeManagerUtility.CodeManagerAPIPath);
+            }*/
+        }
+        #endregion
     }
 }
 

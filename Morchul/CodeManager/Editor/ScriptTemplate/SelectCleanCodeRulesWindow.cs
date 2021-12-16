@@ -9,7 +9,7 @@ namespace Morchul.CodeManager
     /// <summary>
     /// A selection List from all clean code rules to choose for which will be scanned.
     /// </summary>
-    public class SelectCleanCodeRulesWindow : EditorWindow
+    public class SelectCleanCodeRulesWindow : EditorWindow, IHasCustomMenu
     {
         private static SelectCleanCodeRulesWindow instance;
 
@@ -143,6 +143,18 @@ namespace Morchul.CodeManager
             GUILayout.EndArea();
         }
         #endregion
+
+        // Add help menu
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            GUIContent content = new GUIContent("Help");
+            menu.AddItem(content, false, HelpCallback);
+        }
+
+        private void HelpCallback()
+        {
+            CodeManagerEditorUtility.ShowHelpDialog(CodeManagerEditorUtility.CleanCodeRulesSelectionPageNumber);
+        }
     }
 }
 #endif

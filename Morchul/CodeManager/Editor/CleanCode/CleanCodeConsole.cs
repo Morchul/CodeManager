@@ -9,7 +9,7 @@ namespace Morchul.CodeManager
     /// <summary>
     /// The Clean Code console where all clean code violations will be displayed
     /// </summary>
-    public class CleanCodeConsole : EditorWindow
+    public class CleanCodeConsole : EditorWindow, IHasCustomMenu
     {
         private static CleanCodeConsole instance;
 
@@ -149,6 +149,18 @@ namespace Morchul.CodeManager
                 AssetDatabase.OpenAsset(cleanCodeViolations[selectedScriptTemplateIndex].Script, cleanCodeViolations[selectedScriptTemplateIndex].LineIndex);
                 selectedScriptTemplateIndex = -1;
             }
+        }
+
+        // Add help menu
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            GUIContent content = new GUIContent("Help");
+            menu.AddItem(content, false, HelpCallback);
+        }
+
+        private void HelpCallback()
+        {
+            CodeManagerEditorUtility.ShowHelpDialog(CodeManagerEditorUtility.CleanCodeConsolePageNumber);
         }
     }
 }

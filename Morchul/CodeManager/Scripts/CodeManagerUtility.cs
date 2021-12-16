@@ -16,6 +16,9 @@ namespace Morchul.CodeManager
         public const string ScriptTemplateFolder = "ScriptTemplates";
 
         public const string ScriptTemplateFolderPath = "Assets/" + ScriptTemplateFolder;
+
+        //public const string CodeManagerManualPath = CodeManagerPath + "Documentation/CodeManagerManual.pdf";
+        //public const string CodeManagerAPIPath = CodeManagerPath + "Documentation/API/html/index.html";
         #endregion
 
         /// <summary>

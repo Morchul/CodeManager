@@ -12,7 +12,7 @@ namespace Morchul.CodeManager
     /// <summary>
     /// A simple window to test regexes and correct existing ones.
     /// </summary>
-    public class RegexTesterWindow : EditorWindow
+    public class RegexTesterWindow : EditorWindow, IHasCustomMenu
     {
         private static RegexTesterWindow instance;
 
@@ -49,6 +49,7 @@ namespace Morchul.CodeManager
         #endregion
         
         private bool searched;
+        private bool regexValid;
 
         private Vector2 scrollPos;
         private Vector2 scrollPos2;
@@ -89,6 +90,7 @@ namespace Morchul.CodeManager
         {
             values = ScriptableObject.CreateInstance<Values>();
             values.autoSearch = true;
+            regexValid = false;
 
             searched = false;
             settings = CodeManagerEditorUtility.LoadSettings();
@@ -113,11 +115,17 @@ namespace Morchul.CodeManager
             }
         }
 
+        private void SetRegex(string regex)
+        {
+            this.values.regex = regex;
+            this.regexValid = CodeManagerUtility.IsValidRegex(values.regex);
+        }
+
         private void SelectRegex(int index)
         {
             if(settings != null && index >= 0 && index < settings.Regexes.Length)
             {
-                values.regex = settings.Regexes[index].Regex;
+                SetRegex(settings.Regexes[index].Regex);
             }
         }
 
@@ -284,7 +292,7 @@ namespace Morchul.CodeManager
 
         private void Search()
         {
-            if (string.IsNullOrEmpty(values.text) || !CodeManagerUtility.IsValidRegex(values.regex))
+            if (string.IsNullOrEmpty(values.text) || !regexValid)
             {
                 regexMatches.Matches = new RegexTesterMatch[0];
                 return;
@@ -388,6 +396,11 @@ namespace Morchul.CodeManager
 
             string regexTmp = EditorGUILayout.TextArea(values.regex, regexAreaStyle);
 
+            if (!this.regexValid)
+            {
+                EditorGUILayout.HelpBox("Invalid regex!", MessageType.Error);
+            }
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Regex options", GUILayout.Width(100));
             values.regexOptions = (RegexOptions)EditorGUILayout.EnumFlagsField(values.regexOptions);
@@ -419,7 +432,7 @@ namespace Morchul.CodeManager
 
                 //assign new values
                 values.text = textTmp;
-                values.regex = regexTmp;
+                SetRegex(regexTmp);
                 values.autoSearch = autoSearchTmp;
 
                 //update search
@@ -458,6 +471,18 @@ namespace Morchul.CodeManager
             GUILayout.EndArea();
         }
         #endregion
+
+        // Add help menu
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            GUIContent content = new GUIContent("Help");
+            menu.AddItem(content, false, HelpCallback);
+        }
+
+        private void HelpCallback()
+        {
+            CodeManagerEditorUtility.ShowHelpDialog(CodeManagerEditorUtility.TestRegexWindowPageNumber);
+        }
     }
 }
 

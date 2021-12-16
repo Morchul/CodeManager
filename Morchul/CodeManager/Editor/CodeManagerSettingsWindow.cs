@@ -8,7 +8,7 @@ namespace Morchul.CodeManager
     /// <summary>
     /// Code Manager settings window
     /// </summary>
-    public class CodeManagerSettingsWindow : EditorWindow
+    public class CodeManagerSettingsWindow : EditorWindow, IHasCustomMenu
     {
         private static CodeManagerSettingsWindow instance;
 
@@ -715,6 +715,25 @@ namespace Morchul.CodeManager
                 names[i] = settings.Regexes[i].Name;
             }
             return names;
+        }
+
+        // Add help menu
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            GUIContent content = new GUIContent("Help");
+            menu.AddItem(content, false, HelpCallback);
+        }
+
+        private void HelpCallback()
+        {
+            int pageNumber = 0;
+            switch (selectedTab)
+            {
+                case 0: pageNumber = CodeManagerEditorUtility.ScriptTemplatesPageNumber; break;
+                case 1: pageNumber = CodeManagerEditorUtility.CleanCodeRulesPageNumber; break;
+                case 2: pageNumber = CodeManagerEditorUtility.RegexesPageNumber; break;
+            }
+            CodeManagerEditorUtility.ShowHelpDialog(pageNumber);
         }
     }
 }

@@ -29,7 +29,13 @@ namespace Morchul.CodeManager
             CleanCodeConsole.ShowWindow();
         }
 
-        [MenuItem("Code Manager/Settings")]
+        [MenuItem("Code Manager/Help")]
+        private static void OpenCodeManagerHelp()
+        {
+            CodeManagerEditorUtility.ShowHelpDialog();
+        }
+
+        [MenuItem("Code Manager/Settings", priority = 10)]
         private static void OpenCodeManagerSettings()
         {
             CodeManagerSettingsWindow.ShowWindow();

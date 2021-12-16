@@ -9,7 +9,7 @@ namespace Morchul.CodeManager
     /// <summary>
     /// Window where script name and creation path are defined and where the final create command is executed.
     /// </summary>
-    public class CreateScriptWindow : EditorWindow
+    public class CreateScriptWindow : EditorWindow, IHasCustomMenu
     {
         private static CreateScriptWindow instance;
 
@@ -176,6 +176,18 @@ namespace Morchul.CodeManager
             }
         }
         #endregion
+
+        // Add help menu
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            GUIContent content = new GUIContent("Help");
+            menu.AddItem(content, false, HelpCallback);
+        }
+
+        private void HelpCallback()
+        {
+            CodeManagerEditorUtility.ShowHelpDialog(CodeManagerEditorUtility.NewScriptPageNumber);
+        }
     }
 }
 

@@ -10,7 +10,7 @@ namespace Morchul.CodeManager
     /// <summary>
     /// A selection List from all script templates
     /// </summary>
-    public class SelectScriptTemplateWindow : EditorWindow
+    public class SelectScriptTemplateWindow : EditorWindow, IHasCustomMenu
     {
         private static SelectScriptTemplateWindow instance;
 
@@ -137,6 +137,18 @@ namespace Morchul.CodeManager
             };
         }
         #endregion
+
+        // Add help menu
+        void IHasCustomMenu.AddItemsToMenu(GenericMenu menu)
+        {
+            GUIContent content = new GUIContent("Help");
+            menu.AddItem(content, false, HelpCallback);
+        }
+
+        private void HelpCallback()
+        {
+            CodeManagerEditorUtility.ShowHelpDialog(CodeManagerEditorUtility.NewScriptPageNumber);
+        }
     }
 }
 #endif
