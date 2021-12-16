@@ -35,6 +35,12 @@ namespace Morchul.CodeManager
             CodeManagerEditorUtility.ShowHelpDialog();
         }
 
+        [MenuItem("Code Manager/About")]
+        private static void OpenCodeManagerAbout()
+        {
+            EditorUtility.DisplayDialog("About", CodeManager.GetCodeManagerInformation(), "Close"); ;
+        }
+
         [MenuItem("Code Manager/Settings", priority = 10)]
         private static void OpenCodeManagerSettings()
         {
