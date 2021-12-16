@@ -26,7 +26,6 @@ namespace Morchul.CodeManager
 
         private ScriptFolder[] scriptFolders;
 
-        private ScriptFolder selectedScriptFolder;
         private string path;
 
         private ScriptTemplate scriptTemplate;
@@ -161,7 +160,7 @@ namespace Morchul.CodeManager
                 return;
             }
 
-            ScriptCreator.CreateNewScript(scriptName, scriptTemplate, selectedScriptFolder);
+            ScriptCreator.CreateNewScript(scriptName, scriptTemplate, path);
             instance.Close();
         }
 
@@ -170,8 +169,7 @@ namespace Morchul.CodeManager
             if (folder is ScriptFolder scriptFolder)
             {
                 selectedFolderName = scriptFolder.Name;
-                selectedScriptFolder = scriptFolder;
-                path = selectedScriptFolder.Path;
+                path = scriptFolder.Path;
                 Repaint();
             }
         }

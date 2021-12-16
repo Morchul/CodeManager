@@ -15,9 +15,11 @@ MonoBehaviour:
   ScriptFolders:
   - Name: Defaultfolder
     Path: Assets/Scripts/
-    CleanCodeRules: 01000000
+    CleanCodeRules: 0100000004000000
     IncludeSubDirectory: 1
-  Placeholders: []
+  Placeholders:
+  - Name: namespace
+    Value: Morchul
   UnwantedCodes:
   - Name: Empty Codeblock
     RegexIndex: 0

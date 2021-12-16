@@ -74,9 +74,9 @@ namespace Morchul.CodeManager
         /// <param name="scriptName">The name of the file and class</param>
         /// <param name="scriptTemplate">The script template from which the script will be created</param>
         /// <param name="scriptFolder">The scriptfolder in which the script will be created</param>
-        public static void CreateNewScript(string scriptName, ScriptTemplate scriptTemplate, ScriptFolder scriptFolder)
+        public static void CreateNewScript(string scriptName, ScriptTemplate scriptTemplate, string path)
         {
-            string path = scriptFolder.Path + scriptName + ".cs";
+            path += scriptName + ".cs";
             if (File.Exists(path))
             {
                 Debug.LogError("The File already Exists!");
