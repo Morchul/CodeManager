@@ -85,7 +85,7 @@ namespace Morchul.CodeManager
             {
                 //Replace all placeholders
                 CodeInspection codeInspection = CodeInspector.InspectText(scriptTemplate.Template.text);
-                codeInspection.FindAll(@"%.*%", out LinkedListNode<CodePiece>[] foundPlaceholders);
+                codeInspection.FindAll(@"%[^%]*%", out LinkedListNode<CodePiece>[] foundPlaceholders);
 
                 if (foundPlaceholders.Length > 0)
                 {
